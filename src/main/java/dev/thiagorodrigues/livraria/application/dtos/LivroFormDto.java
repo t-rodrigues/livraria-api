@@ -2,6 +2,7 @@ package dev.thiagorodrigues.livraria.application.dtos;
 
 import java.time.LocalDate;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Size;
@@ -22,6 +23,7 @@ public class LivroFormDto {
     @Min(value = 100)
     private Integer numeroPaginas;
 
+    @Valid
     private AutorFormDto autor;
 
 }
