@@ -2,7 +2,6 @@ package dev.thiagorodrigues.livraria.application.dtos;
 
 import java.time.LocalDate;
 
-import dev.thiagorodrigues.livraria.domain.entities.Autor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,10 +9,11 @@ import lombok.Setter;
 @Setter
 public class LivroResponseDto {
 
+    private Long id;
     private String titulo;
     private LocalDate dataLancamento;
     private Integer numeroPaginas;
 
-    private Autor autor;
+    private LivroResponseAutor autor;
 
 }

@@ -24,6 +24,6 @@ public class LivroFormDto {
     private Integer numeroPaginas;
 
     @Valid
-    private AutorFormDto autor;
+    private LivroFormAutorDto autor;
 
 }

@@ -17,6 +17,7 @@ public class LivroRepository {
     }
 
     public Livro save(Livro livro) {
+        livro.setId(livros.size() + 1L);
         livros.add(livro);
 
         return livro;

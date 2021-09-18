@@ -17,9 +17,15 @@ public class AutorRepository {
     }
 
     public Autor save(Autor autor) {
+        autor.setId(autores.size() + 1l);
         autores.add(autor);
 
         return autor;
+    }
+
+    public Autor findById(Long id) {
+        return autores.stream().filter(autor -> autor.getId().equals(id)).findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Autor não cadastrado"));
     }
 
 }
