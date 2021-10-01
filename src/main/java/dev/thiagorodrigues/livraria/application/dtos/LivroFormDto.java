@@ -1,14 +1,17 @@
 package dev.thiagorodrigues.livraria.application.dtos;
 
-import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Size;
 
-import lombok.Getter;
-import lombok.Setter;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -18,12 +21,14 @@ public class LivroFormDto {
     private String titulo;
 
     @PastOrPresent
+    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDate dataLancamento;
 
     @Min(value = 100)
     private Integer numeroPaginas;
 
-    @Valid
-    private LivroFormAutorDto autor;
+    @NotNull
+    @JsonAlias("autor_id")
+    private Long autorId;
 
 }
