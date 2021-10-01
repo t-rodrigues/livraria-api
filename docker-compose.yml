@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: db-container
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: docker
+      MYSQL_DATABASE: livraria
+    ports:
+      - 3306:3306
+    volumes:
+      - livraria_data:/var/lib/mysql
+
+volumes:
+  livraria_data:
