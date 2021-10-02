@@ -1,15 +1,15 @@
 package dev.thiagorodrigues.livraria.application.controllers;
 
-import java.util.List;
-
-import javax.validation.Valid;
-
-import org.springframework.web.bind.annotation.*;
-
 import dev.thiagorodrigues.livraria.application.dtos.AutorFormDto;
 import dev.thiagorodrigues.livraria.application.dtos.AutorResponseDto;
 import dev.thiagorodrigues.livraria.domain.services.AutorService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RequiredArgsConstructor
 @RestController
@@ -19,8 +19,8 @@ public class AutorController {
     private final AutorService autorService;
 
     @GetMapping
-    public List<AutorResponseDto> getAutores() {
-        return autorService.getAutores();
+    public Page<AutorResponseDto> getAutores(@PageableDefault(size = 15) Pageable paginacao) {
+        return autorService.getAutores(paginacao);
     }
 
     @PostMapping

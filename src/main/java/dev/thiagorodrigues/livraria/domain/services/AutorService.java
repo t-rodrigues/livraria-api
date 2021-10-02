@@ -6,10 +6,9 @@ import dev.thiagorodrigues.livraria.domain.entities.Autor;
 import dev.thiagorodrigues.livraria.infra.repositories.AutorRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,10 +18,10 @@ public class AutorService {
 
     private ModelMapper mapper = new ModelMapper();
 
-    public List<AutorResponseDto> getAutores() {
-        List<Autor> autores = autorRepository.findAll();
+    public Page<AutorResponseDto> getAutores(Pageable paginacao) {
+        Page<Autor> autores = autorRepository.findAll(paginacao);
 
-        return autores.stream().map(autor -> mapper.map(autor, AutorResponseDto.class)).collect(Collectors.toList());
+        return autores.map(autor -> mapper.map(autor, AutorResponseDto.class));
     }
 
     public void createAutor(AutorFormDto autorFormDto) {

@@ -7,10 +7,9 @@ import dev.thiagorodrigues.livraria.infra.repositories.AutorRepository;
 import dev.thiagorodrigues.livraria.infra.repositories.LivroRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,10 +20,10 @@ public class LivroService {
 
     private ModelMapper mapper = new ModelMapper();
 
-    public List<LivroResponseDto> getLivros() {
-        List<Livro> livros = livroRepository.findAll();
+    public Page<LivroResponseDto> getLivros(Pageable paginacao) {
+        Page<Livro> livros = livroRepository.findAll(paginacao);
 
-        return livros.stream().map(livro -> mapper.map(livro, LivroResponseDto.class)).collect(Collectors.toList());
+        return livros.map(livro -> mapper.map(livro, LivroResponseDto.class));
     }
 
     public void createLivro(LivroFormDto livroFormDto) {
@@ -34,4 +33,5 @@ public class LivroService {
 
         livroRepository.save(livro);
     }
+
 }
