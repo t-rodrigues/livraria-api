@@ -30,6 +30,7 @@ public class LivroService {
         Livro livro = mapper.map(livroFormDto, Livro.class);
         livro.setAutor(autorRepository.findById(livroFormDto.getAutorId())
                 .orElseThrow(() -> new IllegalStateException("Autor não encontrado")));
+        livro.setId(null);
 
         livroRepository.save(livro);
     }
