@@ -19,7 +19,7 @@ public class RelatorioLivrosPorAutorDto {
     }
 
     private void setPercentual(Double percentual) {
-        this.percentual = BigDecimal.valueOf(percentual * 100).setScale(1, RoundingMode.CEILING);
+        this.percentual = BigDecimal.valueOf(percentual * 100).setScale(2, RoundingMode.HALF_UP);
     }
 
 }
