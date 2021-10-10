@@ -22,9 +22,11 @@ public class LivroFormDto {
 
     @PastOrPresent
     @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy")
+    @JsonAlias("data_nascimento")
     private LocalDate dataLancamento;
 
     @Min(value = 100)
+    @JsonAlias("numero_paginas")
     private Integer numeroPaginas;
 
     @NotNull
