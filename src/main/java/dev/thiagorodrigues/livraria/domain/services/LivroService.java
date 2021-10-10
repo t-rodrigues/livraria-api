@@ -26,13 +26,14 @@ public class LivroService {
         return livros.map(livro -> mapper.map(livro, LivroResponseDto.class));
     }
 
-    public void createLivro(LivroFormDto livroFormDto) {
+    public LivroResponseDto createLivro(LivroFormDto livroFormDto) {
         Livro livro = mapper.map(livroFormDto, Livro.class);
-        livro.setAutor(autorRepository.findById(livroFormDto.getAutorId())
-                .orElseThrow(() -> new IllegalStateException("Autor não encontrado")));
+        livro.setAutor(autorRepository.getById(livroFormDto.getAutorId()));
         livro.setId(null);
 
         livroRepository.save(livro);
+
+        return mapper.map(livro, LivroResponseDto.class);
     }
 
 }

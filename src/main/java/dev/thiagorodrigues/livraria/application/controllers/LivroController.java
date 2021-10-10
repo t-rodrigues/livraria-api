@@ -7,9 +7,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/livros")
@@ -24,8 +28,13 @@ public class LivroController {
     }
 
     @PostMapping
-    public void createLivro(@RequestBody @Valid LivroFormDto livroFormDto) {
-        livroService.createLivro(livroFormDto);
+    public ResponseEntity<LivroResponseDto> createLivro(@RequestBody @Valid LivroFormDto livroFormDto,
+            UriComponentsBuilder uriComponentsBuilder) {
+        LivroResponseDto livro = livroService.createLivro(livroFormDto);
+
+        URI location = uriComponentsBuilder.path("/livros/{id}").buildAndExpand(livro.getId()).toUri();
+
+        return ResponseEntity.created(location).body(livro);
     }
 
 }
