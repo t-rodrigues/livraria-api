@@ -24,10 +24,12 @@ public class AutorService {
         return autores.map(autor -> mapper.map(autor, AutorResponseDto.class));
     }
 
-    public void createAutor(AutorFormDto autorFormDto) {
+    public AutorResponseDto createAutor(AutorFormDto autorFormDto) {
         Autor autor = mapper.map(autorFormDto, Autor.class);
 
         autorRepository.save(autor);
+
+        return mapper.map(autor, AutorResponseDto.class);
     }
 
 }
