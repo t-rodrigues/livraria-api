@@ -10,6 +10,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +27,7 @@ public class LivroService {
         return livros.map(livro -> mapper.map(livro, LivroResponseDto.class));
     }
 
+    @Transactional
     public LivroResponseDto createLivro(LivroFormDto livroFormDto) {
         Livro livro = mapper.map(livroFormDto, Livro.class);
         livro.setAutor(autorRepository.getById(livroFormDto.getAutorId()));

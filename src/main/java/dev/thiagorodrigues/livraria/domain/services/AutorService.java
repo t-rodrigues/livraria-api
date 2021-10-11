@@ -9,6 +9,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class AutorService {
         return autores.map(autor -> mapper.map(autor, AutorResponseDto.class));
     }
 
+    @Transactional
     public AutorResponseDto createAutor(AutorFormDto autorFormDto) {
         Autor autor = mapper.map(autorFormDto, Autor.class);
 
