@@ -1,5 +1,6 @@
 package dev.thiagorodrigues.livraria.application.controllers;
 
+import dev.thiagorodrigues.livraria.application.dtos.AutorDetalhadoResponseDto;
 import dev.thiagorodrigues.livraria.application.dtos.AutorFormDto;
 import dev.thiagorodrigues.livraria.application.dtos.AutorResponseDto;
 import dev.thiagorodrigues.livraria.domain.services.AutorService;
@@ -27,10 +28,17 @@ public class AutorController {
         return autorService.getAutores(paginacao);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<AutorDetalhadoResponseDto> detalhar(@PathVariable Long id) {
+        var autorDetalhadoResponseDto = autorService.detalhar(id);
+
+        return ResponseEntity.ok(autorDetalhadoResponseDto);
+    }
+
     @PostMapping
-    public ResponseEntity<AutorResponseDto> createAutor(@RequestBody @Valid AutorFormDto autorFormDto,
+    public ResponseEntity<AutorResponseDto> criar(@RequestBody @Valid AutorFormDto autorFormDto,
             UriComponentsBuilder uriComponentsBuilder) {
-        var autorResponseDto = autorService.createAutor(autorFormDto);
+        var autorResponseDto = autorService.criar(autorFormDto);
 
         URI location = uriComponentsBuilder.path("/autores/{id}").buildAndExpand(autorResponseDto.getId()).toUri();
 

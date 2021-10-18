@@ -1,8 +1,10 @@
 package dev.thiagorodrigues.livraria.domain.services;
 
+import dev.thiagorodrigues.livraria.application.dtos.AutorDetalhadoResponseDto;
 import dev.thiagorodrigues.livraria.application.dtos.AutorFormDto;
 import dev.thiagorodrigues.livraria.application.dtos.AutorResponseDto;
 import dev.thiagorodrigues.livraria.domain.entities.Autor;
+import dev.thiagorodrigues.livraria.domain.exceptions.NotFoundException;
 import dev.thiagorodrigues.livraria.infra.repositories.AutorRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -17,21 +19,28 @@ public class AutorService {
 
     private final AutorRepository autorRepository;
 
-    private ModelMapper mapper = new ModelMapper();
+    private ModelMapper modelMapper = new ModelMapper();
 
     public Page<AutorResponseDto> getAutores(Pageable paginacao) {
         Page<Autor> autores = autorRepository.findAll(paginacao);
 
-        return autores.map(autor -> mapper.map(autor, AutorResponseDto.class));
+        return autores.map(autor -> modelMapper.map(autor, AutorResponseDto.class));
+    }
+
+    public AutorDetalhadoResponseDto detalhar(long id) {
+        var autor = this.autorRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Autor inexistente: " + id));
+
+        return modelMapper.map(autor, AutorDetalhadoResponseDto.class);
     }
 
     @Transactional
-    public AutorResponseDto createAutor(AutorFormDto autorFormDto) {
-        Autor autor = mapper.map(autorFormDto, Autor.class);
+    public AutorResponseDto criar(AutorFormDto autorFormDto) {
+        Autor autor = modelMapper.map(autorFormDto, Autor.class);
 
         autorRepository.save(autor);
 
-        return mapper.map(autor, AutorResponseDto.class);
+        return modelMapper.map(autor, AutorResponseDto.class);
     }
 
 }
