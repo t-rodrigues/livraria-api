@@ -23,14 +23,21 @@ public class LivroController {
     private final LivroService livroService;
 
     @GetMapping
-    public Page<LivroResponseDto> getLivros(@PageableDefault(sort = "titulo", size = 15) Pageable paginacao) {
-        return livroService.getLivros(paginacao);
+    public Page<LivroResponseDto> listar(@PageableDefault(sort = "titulo", size = 15) Pageable paginacao) {
+        return livroService.listar(paginacao);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<LivroResponseDto> detalhar(@PathVariable Long id) {
+        LivroResponseDto livro = livroService.detalhar(id);
+
+        return ResponseEntity.ok(livro);
     }
 
     @PostMapping
-    public ResponseEntity<LivroResponseDto> createLivro(@RequestBody @Valid LivroFormDto livroFormDto,
+    public ResponseEntity<LivroResponseDto> criar(@RequestBody @Valid LivroFormDto livroFormDto,
             UriComponentsBuilder uriComponentsBuilder) {
-        LivroResponseDto livro = livroService.createLivro(livroFormDto);
+        LivroResponseDto livro = livroService.criar(livroFormDto);
 
         URI location = uriComponentsBuilder.path("/livros/{id}").buildAndExpand(livro.getId()).toUri();
 

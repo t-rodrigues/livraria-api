@@ -3,6 +3,7 @@ package dev.thiagorodrigues.livraria.application.exceptions;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import java.util.Objects;
 
 @Getter
 @JsonInclude(Include.NON_NULL)
-public class StandardError {
+public class ErrorResponse {
 
     private LocalDateTime timestamp;
     private Integer status;
@@ -20,14 +21,12 @@ public class StandardError {
     private List<ValidationError> errors;
     private String path;
 
+    @NoArgsConstructor
     public static class Builder {
         private Integer status;
         private String error;
         private String message;
         private String path;
-
-        public Builder() {
-        }
 
         public Builder status(Integer status) {
             this.status = status;
@@ -49,8 +48,8 @@ public class StandardError {
             return this;
         }
 
-        public StandardError build() {
-            return new StandardError(this);
+        public ErrorResponse build() {
+            return new ErrorResponse(this);
         }
     }
 
@@ -61,7 +60,7 @@ public class StandardError {
         this.errors.add(new ValidationError(field, message));
     }
 
-    private StandardError(Builder builder) {
+    private ErrorResponse(Builder builder) {
         timestamp = LocalDateTime.now();
         status = builder.status;
         error = builder.error;
