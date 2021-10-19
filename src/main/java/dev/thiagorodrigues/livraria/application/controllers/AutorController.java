@@ -54,4 +54,11 @@ public class AutorController {
         return ResponseEntity.ok(autorDetalhadoResponseDto);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+        autorService.deletar(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
 }

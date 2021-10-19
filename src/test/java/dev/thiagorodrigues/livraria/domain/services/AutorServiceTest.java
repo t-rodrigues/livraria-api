@@ -14,11 +14,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import javax.persistence.EntityNotFoundException;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -96,6 +99,28 @@ class AutorServiceTest {
         assertEquals(autorAtualizado.getMiniCurriculo(), autorResponse.getMiniCurriculo());
         verify(autorRepository, times(1)).getById(autorUpdateFormDto.getId());
         verify(autorRepository, times(1)).save(any(Autor.class));
+    }
+
+    @Test
+    void deletarDeveriaLancarNotFoundExceptionQuandoIdInvalido() {
+        doThrow(EmptyResultDataAccessException.class).when(autorRepository).deleteById(invalidId);
+
+        assertThrows(NotFoundException.class, () -> autorService.deletar(invalidId));
+        verify(autorRepository, times(1)).deleteById(invalidId);
+    }
+
+    @Test
+    void deletarDeveriaLancarDomainExceptionQuandoAutorDependente() {
+        doThrow(DataIntegrityViolationException.class).when(autorRepository).deleteById(validId);
+
+        assertThrows(DomainException.class, () -> autorService.deletar(validId));
+        verify(autorRepository, times(1)).deleteById(validId);
+    }
+
+    @Test
+    void DeleteDeveriaFazerNadaQuandoAutorPodeSerDeletado() {
+        assertDoesNotThrow(() -> autorService.deletar(validId));
+        verify(autorRepository, times(1)).deleteById(validId);
     }
 
 }
