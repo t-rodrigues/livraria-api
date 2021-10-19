@@ -2,7 +2,6 @@ package dev.thiagorodrigues.livraria.domain.services;
 
 import dev.thiagorodrigues.livraria.application.dtos.AutorDetalhadoResponseDto;
 import dev.thiagorodrigues.livraria.application.dtos.AutorFormDto;
-import dev.thiagorodrigues.livraria.application.dtos.AutorResponseDto;
 import dev.thiagorodrigues.livraria.application.dtos.AutorUpdateFormDto;
 import dev.thiagorodrigues.livraria.domain.entities.Autor;
 import dev.thiagorodrigues.livraria.domain.exceptions.DomainException;
@@ -52,13 +51,15 @@ class AutorServiceTest {
 
     @Test
     void criarDeveriaRetornarUmAutor() {
-        when(autorRepository.save(any(Autor.class))).thenReturn(AutorFactory.criarAutor());
+        when(autorRepository.save(any())).thenReturn(autor);
 
-        AutorResponseDto autorResponseDto = autorService.criar(autorFormDto);
+        var autorDetalhadoResponseDto = autorService.criar(autorFormDto);
 
-        assertEquals(autor.getNome(), autorResponseDto.getNome());
-        assertEquals(autor.getEmail(), autorResponseDto.getEmail());
-        assertEquals(autor.getDataNascimento(), autorResponseDto.getDataNascimento());
+        assertEquals(autor.getNome(), autorDetalhadoResponseDto.getNome());
+        assertEquals(autor.getEmail(), autorDetalhadoResponseDto.getEmail());
+        assertEquals(autor.getDataNascimento(), autorDetalhadoResponseDto.getDataNascimento());
+        assertEquals(autor.getMiniCurriculo(), autorDetalhadoResponseDto.getMiniCurriculo());
+        verify(autorRepository, times(1)).save(any(Autor.class));
     }
 
     @Test

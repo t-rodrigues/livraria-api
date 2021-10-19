@@ -37,7 +37,7 @@ public class AutorController {
     }
 
     @PostMapping
-    public ResponseEntity<AutorResponseDto> criar(@RequestBody @Valid AutorFormDto autorFormDto,
+    public ResponseEntity<AutorDetalhadoResponseDto> criar(@RequestBody @Valid AutorFormDto autorFormDto,
             UriComponentsBuilder uriComponentsBuilder) {
         var autorResponseDto = autorService.criar(autorFormDto);
 

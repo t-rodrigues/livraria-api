@@ -42,12 +42,12 @@ public class AutorService {
     }
 
     @Transactional
-    public AutorResponseDto criar(AutorFormDto autorFormDto) {
+    public AutorDetalhadoResponseDto criar(AutorFormDto autorFormDto) {
         Autor autor = modelMapper.map(autorFormDto, Autor.class);
 
         autorRepository.save(autor);
 
-        return modelMapper.map(autor, AutorResponseDto.class);
+        return modelMapper.map(autor, AutorDetalhadoResponseDto.class);
     }
 
     @Transactional
