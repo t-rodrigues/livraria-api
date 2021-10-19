@@ -3,6 +3,7 @@ package dev.thiagorodrigues.livraria.application.controllers;
 import dev.thiagorodrigues.livraria.application.dtos.AutorDetalhadoResponseDto;
 import dev.thiagorodrigues.livraria.application.dtos.AutorFormDto;
 import dev.thiagorodrigues.livraria.application.dtos.AutorResponseDto;
+import dev.thiagorodrigues.livraria.application.dtos.AutorUpdateFormDto;
 import dev.thiagorodrigues.livraria.domain.services.AutorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -43,6 +44,14 @@ public class AutorController {
         URI location = uriComponentsBuilder.path("/autores/{id}").buildAndExpand(autorResponseDto.getId()).toUri();
 
         return ResponseEntity.created(location).body(autorResponseDto);
+    }
+
+    @PutMapping
+    public ResponseEntity<AutorDetalhadoResponseDto> atualizar(
+            @RequestBody @Valid AutorUpdateFormDto autorUpdateFormDto) {
+        var autorDetalhadoResponseDto = autorService.atualizar(autorUpdateFormDto);
+
+        return ResponseEntity.ok(autorDetalhadoResponseDto);
     }
 
 }

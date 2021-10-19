@@ -3,7 +3,9 @@ package dev.thiagorodrigues.livraria.domain.services;
 import dev.thiagorodrigues.livraria.application.dtos.AutorDetalhadoResponseDto;
 import dev.thiagorodrigues.livraria.application.dtos.AutorFormDto;
 import dev.thiagorodrigues.livraria.application.dtos.AutorResponseDto;
+import dev.thiagorodrigues.livraria.application.dtos.AutorUpdateFormDto;
 import dev.thiagorodrigues.livraria.domain.entities.Autor;
+import dev.thiagorodrigues.livraria.domain.exceptions.DomainException;
 import dev.thiagorodrigues.livraria.domain.exceptions.NotFoundException;
 import dev.thiagorodrigues.livraria.infra.repositories.AutorRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityNotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +45,27 @@ public class AutorService {
         autorRepository.save(autor);
 
         return modelMapper.map(autor, AutorResponseDto.class);
+    }
+
+    @Transactional
+    public AutorDetalhadoResponseDto atualizar(AutorUpdateFormDto autorUpdateFormDto) {
+        try {
+            var autor = this.autorRepository.getById(autorUpdateFormDto.getId());
+            atualizarDadosAutor(autor, autorUpdateFormDto);
+
+            this.autorRepository.save(autor);
+
+            return modelMapper.map(autor, AutorDetalhadoResponseDto.class);
+        } catch (EntityNotFoundException e) {
+            throw new DomainException("Autor inválido");
+        }
+    }
+
+    private void atualizarDadosAutor(Autor autor, AutorUpdateFormDto autorUpdateFormDto) {
+        autor.setNome(autorUpdateFormDto.getNome());
+        autor.setEmail(autorUpdateFormDto.getEmail());
+        autor.setDataNascimento(autorUpdateFormDto.getDataNascimento());
+        autor.setMiniCurriculo(autorUpdateFormDto.getMiniCurriculo());
     }
 
 }
