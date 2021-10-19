@@ -27,12 +27,14 @@ public class AutorService {
 
     private ModelMapper modelMapper = new ModelMapper();
 
-    public Page<AutorResponseDto> getAutores(Pageable paginacao) {
+    @Transactional(readOnly = true)
+    public Page<AutorResponseDto> listar(Pageable paginacao) {
         Page<Autor> autores = autorRepository.findAll(paginacao);
 
         return autores.map(autor -> modelMapper.map(autor, AutorResponseDto.class));
     }
 
+    @Transactional(readOnly = true)
     public AutorDetalhadoResponseDto detalhar(long id) {
         var autor = autorRepository.findById(id).orElseThrow(() -> new NotFoundException("Autor inexistente: " + id));
 

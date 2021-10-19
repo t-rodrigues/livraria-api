@@ -25,8 +25,8 @@ public class AutorController {
     private final AutorService autorService;
 
     @GetMapping
-    public Page<AutorResponseDto> getAutores(@PageableDefault(size = 15) Pageable paginacao) {
-        return autorService.getAutores(paginacao);
+    public Page<AutorResponseDto> listar(@PageableDefault(size = 15) Pageable paginacao) {
+        return autorService.listar(paginacao);
     }
 
     @GetMapping("/{id}")
