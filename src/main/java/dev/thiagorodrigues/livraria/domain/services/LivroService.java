@@ -2,6 +2,7 @@ package dev.thiagorodrigues.livraria.domain.services;
 
 import dev.thiagorodrigues.livraria.application.dtos.LivroFormDto;
 import dev.thiagorodrigues.livraria.application.dtos.LivroResponseDto;
+import dev.thiagorodrigues.livraria.application.dtos.LivroUpdateFormDto;
 import dev.thiagorodrigues.livraria.domain.entities.Livro;
 import dev.thiagorodrigues.livraria.domain.exceptions.DomainException;
 import dev.thiagorodrigues.livraria.domain.exceptions.NotFoundException;
@@ -15,20 +16,22 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service
 @RequiredArgsConstructor
 public class LivroService {
 
-    private ModelMapper mapper = new ModelMapper();
+    private ModelMapper modelMapper = new ModelMapper();
 
     private final LivroRepository livroRepository;
     private final AutorRepository autorRepository;
 
     @Transactional(readOnly = true)
     public Page<LivroResponseDto> listar(Pageable paginacao) {
-        Page<Livro> livros = livroRepository.findAll(paginacao);
+        var livros = livroRepository.findAll(paginacao);
 
-        return livros.map(livro -> mapper.map(livro, LivroResponseDto.class));
+        return livros.map(livro -> modelMapper.map(livro, LivroResponseDto.class));
     }
 
     @Transactional(readOnly = true)
@@ -36,22 +39,46 @@ public class LivroService {
         var livro = livroRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Livro não encontrado: " + id));
 
-        return mapper.map(livro, LivroResponseDto.class);
+        return modelMapper.map(livro, LivroResponseDto.class);
     }
 
     @Transactional
     public LivroResponseDto criar(LivroFormDto livroFormDto) {
         try {
-            Livro livro = mapper.map(livroFormDto, Livro.class);
+            var livro = modelMapper.map(livroFormDto, Livro.class);
             livro.setId(null);
             livro.setAutor(autorRepository.getById(livroFormDto.getAutorId()));
 
             livroRepository.save(livro);
 
-            return mapper.map(livro, LivroResponseDto.class);
+            return modelMapper.map(livro, LivroResponseDto.class);
         } catch (DataIntegrityViolationException e) {
             throw new DomainException("Autor inválido");
         }
+    }
+
+    @Transactional
+    public LivroResponseDto atualizar(LivroUpdateFormDto livroUpdateFormDto) {
+        try {
+            var livro = livroRepository.getById(livroUpdateFormDto.getId());
+
+            atualizarDados(livro, livroUpdateFormDto);
+            livroRepository.save(livro);
+
+            return modelMapper.map(livro, LivroResponseDto.class);
+        } catch (EntityNotFoundException e) {
+            throw new DomainException("Livro inválido: " + livroUpdateFormDto.getId());
+        }
+    }
+
+    private void atualizarDados(Livro livro, LivroUpdateFormDto livroUpdateFormDto) {
+        var autor = autorRepository.findById(livroUpdateFormDto.getAutorId())
+                .orElseThrow(() -> new DomainException("Autor inexistente"));
+
+        livro.setTitulo(livroUpdateFormDto.getTitulo());
+        livro.setDataLancamento(livroUpdateFormDto.getDataLancamento());
+        livro.setNumeroPaginas(livroUpdateFormDto.getNumeroPaginas());
+        livro.setAutor(autor);
     }
 
 }

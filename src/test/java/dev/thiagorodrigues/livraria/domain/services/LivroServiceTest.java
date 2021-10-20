@@ -2,6 +2,7 @@ package dev.thiagorodrigues.livraria.domain.services;
 
 import dev.thiagorodrigues.livraria.application.dtos.LivroFormDto;
 import dev.thiagorodrigues.livraria.application.dtos.LivroResponseDto;
+import dev.thiagorodrigues.livraria.application.dtos.LivroUpdateFormDto;
 import dev.thiagorodrigues.livraria.domain.entities.Livro;
 import dev.thiagorodrigues.livraria.domain.exceptions.DomainException;
 import dev.thiagorodrigues.livraria.domain.exceptions.NotFoundException;
@@ -16,6 +17,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
+
+import javax.persistence.EntityNotFoundException;
 
 import java.util.Optional;
 
@@ -41,14 +44,18 @@ class LivroServiceTest {
     private LivroService livroService;
 
     private Livro livro;
+    private Livro livroAtualizado;
     private LivroResponseDto livroResponseDto;
     private LivroFormDto livroFormDto;
+    private LivroUpdateFormDto livroUpdateFormDto;
 
     @BeforeEach
     void setUp() {
         livro = LivroFactory.criarLivro();
+        livroAtualizado = LivroFactory.criarLivroAtualizado();
         livroResponseDto = LivroFactory.criarLivroResponseDto();
         livroFormDto = LivroFactory.criarLivroFormDto();
+        livroUpdateFormDto = LivroFactory.criarLivroUpdateFormDto();
     }
 
     @Test
@@ -90,6 +97,35 @@ class LivroServiceTest {
         assertEquals(livroResponseDto.getNumeroPaginas(), livroResponse.getNumeroPaginas());
         assertEquals(livroResponseDto.getDataLancamento(), livroResponse.getDataLancamento());
         assertEquals(livroResponseDto.getAutor().getId(), livroResponse.getAutor().getId());
+        verify(livroRepository, times(1)).save(any(Livro.class));
+    }
+
+    @Test
+    void atualizarDeveriaLancarDomainException() {
+        doThrow(EntityNotFoundException.class).when(livroRepository).getById(anyLong());
+
+        assertThrows(DomainException.class, () -> livroService.atualizar(livroUpdateFormDto));
+    }
+
+    @Test
+    void atualizarDeveriaLancarDomainExceptionQuandoAutorIdInvalido() {
+        when(livroRepository.getById(anyLong())).thenReturn(livro);
+        when(autorRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(DomainException.class, () -> livroService.atualizar(livroUpdateFormDto));
+    }
+
+    @Test
+    void atualizarDeveriaRetornarLivroAtualizadoQuandoDadosValidos() {
+        when(livroRepository.getById(anyLong())).thenReturn(livro);
+        when(autorRepository.findById(anyLong())).thenReturn(Optional.of(AutorFactory.criarAutor()));
+
+        var livroResponse = livroService.atualizar(livroUpdateFormDto);
+
+        assertEquals(livroAtualizado.getTitulo(), livroResponse.getTitulo());
+        assertEquals(livroAtualizado.getNumeroPaginas(), livroResponse.getNumeroPaginas());
+        assertEquals(livroAtualizado.getDataLancamento(), livroResponse.getDataLancamento());
+        assertEquals(livroAtualizado.getAutor().getId(), livroResponse.getAutor().getId());
         verify(livroRepository, times(1)).save(any(Livro.class));
     }
 

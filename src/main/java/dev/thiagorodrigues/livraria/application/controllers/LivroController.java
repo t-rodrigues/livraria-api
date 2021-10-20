@@ -2,6 +2,7 @@ package dev.thiagorodrigues.livraria.application.controllers;
 
 import dev.thiagorodrigues.livraria.application.dtos.LivroFormDto;
 import dev.thiagorodrigues.livraria.application.dtos.LivroResponseDto;
+import dev.thiagorodrigues.livraria.application.dtos.LivroUpdateFormDto;
 import dev.thiagorodrigues.livraria.domain.services.LivroService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -42,6 +43,13 @@ public class LivroController {
         URI location = uriComponentsBuilder.path("/livros/{id}").buildAndExpand(livro.getId()).toUri();
 
         return ResponseEntity.created(location).body(livro);
+    }
+
+    @PutMapping
+    public ResponseEntity<LivroResponseDto> atualizar(@RequestBody @Valid LivroUpdateFormDto livroUpdateFormDto) {
+        LivroResponseDto livroResponseDto = livroService.atualizar(livroUpdateFormDto);
+
+        return ResponseEntity.ok(livroResponseDto);
     }
 
 }
