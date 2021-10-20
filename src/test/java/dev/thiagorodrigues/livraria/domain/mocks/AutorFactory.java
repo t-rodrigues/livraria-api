@@ -16,6 +16,10 @@ public class AutorFactory {
         return new Autor(1L, "John Doe", "john@mail.com", LocalDate.parse("1990-12-29"), "Curriculo");
     }
 
+    public static Autor criarAutor(String nome, String email, LocalDate dataNascimento, String miniCurriculo) {
+        return new Autor(null, nome, email, dataNascimento, miniCurriculo);
+    }
+
     public static Autor criarAutorAtualizado() {
         return new Autor(1L, "Updated John Doe", "updated@mail.com", LocalDate.parse("1990-12-29"),
                 "Updated Curriculo");

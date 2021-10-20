@@ -3,6 +3,7 @@ package dev.thiagorodrigues.livraria.domain.mocks;
 import dev.thiagorodrigues.livraria.application.dtos.LivroFormDto;
 import dev.thiagorodrigues.livraria.application.dtos.LivroResponseDto;
 import dev.thiagorodrigues.livraria.application.dtos.LivroUpdateFormDto;
+import dev.thiagorodrigues.livraria.domain.entities.Autor;
 import dev.thiagorodrigues.livraria.domain.entities.Livro;
 import org.modelmapper.ModelMapper;
 
@@ -14,6 +15,10 @@ public class LivroFactory {
 
     public static Livro criarLivro() {
         return new Livro(1L, "Lorem Ipsum", LocalDate.parse("2020-12-20"), 100, AutorFactory.criarAutor());
+    }
+
+    public static Livro criarLivro(String titulo, LocalDate dataLancamento, Integer numeroPaginas, Autor autor) {
+        return new Livro(null, titulo, dataLancamento, numeroPaginas, autor);
     }
 
     public static Livro criarLivroAtualizado() {
