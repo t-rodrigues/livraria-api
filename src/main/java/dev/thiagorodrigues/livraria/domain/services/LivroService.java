@@ -19,15 +19,24 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class LivroService {
 
+    private ModelMapper mapper = new ModelMapper();
+
     private final LivroRepository livroRepository;
     private final AutorRepository autorRepository;
 
-    private ModelMapper mapper = new ModelMapper();
-
+    @Transactional(readOnly = true)
     public Page<LivroResponseDto> listar(Pageable paginacao) {
         Page<Livro> livros = livroRepository.findAll(paginacao);
 
         return livros.map(livro -> mapper.map(livro, LivroResponseDto.class));
+    }
+
+    @Transactional(readOnly = true)
+    public LivroResponseDto detalhar(Long id) {
+        var livro = livroRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Livro não encontrado: " + id));
+
+        return mapper.map(livro, LivroResponseDto.class);
     }
 
     @Transactional
@@ -43,13 +52,6 @@ public class LivroService {
         } catch (DataIntegrityViolationException e) {
             throw new DomainException("Autor inválido");
         }
-    }
-
-    public LivroResponseDto detalhar(Long id) {
-        var livro = livroRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Livro não encontrado: " + id));
-
-        return mapper.map(livro, LivroResponseDto.class);
     }
 
 }
