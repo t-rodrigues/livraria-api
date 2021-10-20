@@ -52,4 +52,11 @@ public class LivroController {
         return ResponseEntity.ok(livroResponseDto);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+        livroService.deletar(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
 }

@@ -81,4 +81,12 @@ public class LivroService {
         livro.setAutor(autor);
     }
 
+    public void deletar(Long id) {
+        try {
+            livroRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new NotFoundException("Livro inexistente");
+        }
+    }
+
 }

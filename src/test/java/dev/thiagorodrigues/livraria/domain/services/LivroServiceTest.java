@@ -17,19 +17,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import javax.persistence.EntityNotFoundException;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class LivroServiceTest {
@@ -48,6 +47,10 @@ class LivroServiceTest {
     private LivroResponseDto livroResponseDto;
     private LivroFormDto livroFormDto;
     private LivroUpdateFormDto livroUpdateFormDto;
+    private final Long validLivroId = 1L;
+    private final Long invalidLivroId = 100L;
+    private final Long validAutorId = 1L;
+    private final Long invalidAutorId = 100L;
 
     @BeforeEach
     void setUp() {
@@ -60,17 +63,17 @@ class LivroServiceTest {
 
     @Test
     void detalharDeveriaLancarNotFoundExceptionQuandoIdInvalido() {
-        when(livroRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(livroRepository.findById(invalidLivroId)).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> livroService.detalhar(100L));
-        verify(livroRepository, times(1)).findById(anyLong());
+        assertThrows(NotFoundException.class, () -> livroService.detalhar(invalidLivroId));
+        verify(livroRepository, times(1)).findById(invalidLivroId);
     }
 
     @Test
     void detalharDeveriaRetornarLivroResponseDtoQuandoIdValido() {
-        when(livroRepository.findById(anyLong())).thenReturn(Optional.of(livro));
+        when(livroRepository.findById(validLivroId)).thenReturn(Optional.of(livro));
 
-        var livroDto = livroService.detalhar(1L);
+        var livroDto = livroService.detalhar(validLivroId);
 
         assertEquals(livroResponseDto.getId(), livroDto.getId());
         assertEquals(livroResponseDto.getTitulo(), livroDto.getTitulo());
@@ -84,13 +87,14 @@ class LivroServiceTest {
         doThrow(DataIntegrityViolationException.class).when(livroRepository).save(any(Livro.class));
 
         assertThrows(DomainException.class, () -> livroService.criar(livroFormDto));
-        verify(autorRepository, times(1)).getById(anyLong());
+        verify(autorRepository, times(1)).getById(invalidAutorId);
     }
 
     @Test
     void criarDeveriaRetornarLivroQuandoDadosValidos() {
-        when(autorRepository.getById(anyLong())).thenReturn(AutorFactory.criarAutor());
+        when(autorRepository.getById(validAutorId)).thenReturn(AutorFactory.criarAutor());
         when(livroRepository.save(any(Livro.class))).thenReturn(livro);
+
         var livroResponse = livroService.criar(livroFormDto);
 
         assertEquals(livroResponseDto.getTitulo(), livroResponse.getTitulo());
@@ -101,7 +105,7 @@ class LivroServiceTest {
     }
 
     @Test
-    void atualizarDeveriaLancarDomainException() {
+    void atualizarDeveriaLancarDomainExceptionQuandoLivroIdInvalido() {
         doThrow(EntityNotFoundException.class).when(livroRepository).getById(anyLong());
 
         assertThrows(DomainException.class, () -> livroService.atualizar(livroUpdateFormDto));
@@ -109,7 +113,7 @@ class LivroServiceTest {
 
     @Test
     void atualizarDeveriaLancarDomainExceptionQuandoAutorIdInvalido() {
-        when(livroRepository.getById(anyLong())).thenReturn(livro);
+        when(livroRepository.getById(validLivroId)).thenReturn(livro);
         when(autorRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(DomainException.class, () -> livroService.atualizar(livroUpdateFormDto));
@@ -127,6 +131,21 @@ class LivroServiceTest {
         assertEquals(livroAtualizado.getDataLancamento(), livroResponse.getDataLancamento());
         assertEquals(livroAtualizado.getAutor().getId(), livroResponse.getAutor().getId());
         verify(livroRepository, times(1)).save(any(Livro.class));
+    }
+
+    @Test
+    void deletarDeveriaLancarNotFoundExceptionQuandoIdInvalido() {
+        doThrow(EmptyResultDataAccessException.class).when(livroRepository).deleteById(anyLong());
+
+        assertThrows(NotFoundException.class, () -> livroService.deletar(1L));
+    }
+
+    @Test
+    void deletarNaoDeveriaTerRetornoQuandoLivroForDeletado() {
+        doNothing().when(livroRepository).deleteById(anyLong());
+
+        assertDoesNotThrow(() -> livroService.deletar(1L));
+        verify(livroRepository, times(1)).deleteById(anyLong());
     }
 
 }
