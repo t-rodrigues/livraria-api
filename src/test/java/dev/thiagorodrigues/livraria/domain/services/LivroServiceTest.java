@@ -33,6 +33,11 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class LivroServiceTest {
 
+    private final Long validLivroId = 1L;
+    private final Long invalidLivroId = 100L;
+    private final Long validAutorId = 1L;
+    private final Long invalidAutorId = 100L;
+
     @Mock
     private LivroRepository livroRepository;
 
@@ -47,10 +52,6 @@ class LivroServiceTest {
     private LivroResponseDto livroResponseDto;
     private LivroFormDto livroFormDto;
     private LivroUpdateFormDto livroUpdateFormDto;
-    private final Long validLivroId = 1L;
-    private final Long invalidLivroId = 100L;
-    private final Long validAutorId = 1L;
-    private final Long invalidAutorId = 100L;
 
     @BeforeEach
     void setUp() {
@@ -85,6 +86,7 @@ class LivroServiceTest {
     @Test
     void criarDeveriaLancarDomainExceptionQuandoAutorIdInvalido() {
         doThrow(DataIntegrityViolationException.class).when(livroRepository).save(any(Livro.class));
+        livroFormDto.setAutorId(invalidAutorId);
 
         assertThrows(DomainException.class, () -> livroService.criar(livroFormDto));
         verify(autorRepository, times(1)).getById(invalidAutorId);

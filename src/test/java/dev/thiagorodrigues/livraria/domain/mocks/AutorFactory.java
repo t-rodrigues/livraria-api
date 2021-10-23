@@ -20,6 +20,10 @@ public class AutorFactory {
         return new Autor(null, nome, email, dataNascimento, miniCurriculo);
     }
 
+    public static Autor criarAutorSemId() {
+        return new Autor(null, "John Doe", "john@mail.com", LocalDate.parse("1990-12-29"), "Curriculo");
+    }
+
     public static Autor criarAutorAtualizado() {
         return new Autor(1L, "Updated John Doe", "updated@mail.com", LocalDate.parse("1990-12-29"),
                 "Updated Curriculo");
@@ -31,6 +35,10 @@ public class AutorFactory {
 
     public static AutorDetalhadoResponseDto criarAutorDetalhadoResponseDto() {
         return modelMapper.map(criarAutor(), AutorDetalhadoResponseDto.class);
+    }
+
+    public static AutorDetalhadoResponseDto criarAutorAtualizadoResponseDto() {
+        return modelMapper.map(criarAutorAtualizado(), AutorDetalhadoResponseDto.class);
     }
 
     public static AutorUpdateFormDto criarAutorUpdateFormDto() {

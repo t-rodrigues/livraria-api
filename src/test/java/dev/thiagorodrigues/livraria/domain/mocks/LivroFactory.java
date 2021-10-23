@@ -22,11 +22,15 @@ public class LivroFactory {
     }
 
     public static Livro criarLivroAtualizado() {
-        return new Livro(1L, "Updated Lorem Ipsum", LocalDate.parse("2021-12-20"), 120, AutorFactory.criarAutor());
+        return new Livro(1L, "Updated Lorem Ipsum", LocalDate.parse("2021-10-20"), 120, AutorFactory.criarAutor());
     }
 
     public static LivroResponseDto criarLivroResponseDto() {
         return modelMapper.map(criarLivro(), LivroResponseDto.class);
+    }
+
+    public static LivroResponseDto criarLivroAtualizadoResponseDto() {
+        return modelMapper.map(criarLivroAtualizado(), LivroResponseDto.class);
     }
 
     public static LivroFormDto criarLivroFormDto() {

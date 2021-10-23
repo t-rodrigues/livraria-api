@@ -8,21 +8,15 @@ import dev.thiagorodrigues.livraria.domain.mocks.LivroFactory;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@ExtendWith(SpringExtension.class)
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = Replace.NONE)
 @ActiveProfiles("test")
 class LivroRepositoryTest {
 
@@ -33,7 +27,7 @@ class LivroRepositoryTest {
     private TestEntityManager testEntityManager;
 
     @BeforeEach
-    void init() {
+    void setUp() {
         Autor a1 = AutorFactory.criarAutor("André da Silva", "andre@mail.com", LocalDate.parse("1952-12-05"),
                 "Curriculo");
         testEntityManager.persist(a1);
@@ -55,7 +49,7 @@ class LivroRepositoryTest {
     }
 
     @Test
-    void deveriaRetornarRelatorioLivrosPorAutorDto() {
+    void shouldReturnRelatorioLivrosPorAutorDto() {
         var relatorio = livroRepository.relatorioLivrosPorAutorDto();
 
         Assertions.assertThat(relatorio).hasSize(3)

@@ -35,7 +35,7 @@ public class AutorService {
     }
 
     @Transactional(readOnly = true)
-    public AutorDetalhadoResponseDto detalhar(long id) {
+    public AutorDetalhadoResponseDto detalhar(Long id) {
         var autor = autorRepository.findById(id).orElseThrow(() -> new NotFoundException("Autor inexistente: " + id));
 
         return modelMapper.map(autor, AutorDetalhadoResponseDto.class);
