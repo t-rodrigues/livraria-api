@@ -68,8 +68,8 @@ class AutorServiceTest {
     }
 
     @Test
-    void criarDeveriaRetornarUmAutor() {
-        var autorDetalhadoResponseDto = autorService.criar(autorFormDto);
+    void createShouldReturnAuthorWhenSuccessful() {
+        var autorDetalhadoResponseDto = autorService.create(autorFormDto);
 
         assertEquals(autor.getNome(), autorDetalhadoResponseDto.getNome());
         assertEquals(autor.getEmail(), autorDetalhadoResponseDto.getEmail());
@@ -79,14 +79,14 @@ class AutorServiceTest {
     }
 
     @Test
-    void detalharDeveriaLancarNotFoundExceptionQuandoIdInvalido() {
-        assertThrows(NotFoundException.class, () -> autorService.detalhar(invalidId));
+    void detailShouldThrowNotFoundExceptionWhenInvalidId() {
+        assertThrows(NotFoundException.class, () -> autorService.detail(invalidId));
         verify(autorRepository, times(1)).findById(invalidId);
     }
 
     @Test
-    void detalharDeveriaRetornarAutorDetalhadoDtoQuandoIdValido() {
-        var autorResponse = autorService.detalhar(validId);
+    void detailShouldReturnAuthorWhenSuccessful() {
+        var autorResponse = autorService.detail(validId);
 
         assertNotNull(autorResponse);
         assertEquals(autorDetalhadoResponseDto.getId(), autorResponse.getId());
@@ -94,16 +94,16 @@ class AutorServiceTest {
     }
 
     @Test
-    void atualizarDeveriaLancarNotFoundExceptionQuandoIdInvalido() {
+    void updateShouldThrowDomainExceptionWhenInvalidId() {
         autorUpdateFormDto.setId(invalidId);
 
-        assertThrows(DomainException.class, () -> autorService.atualizar(autorUpdateFormDto));
+        assertThrows(DomainException.class, () -> autorService.update(autorUpdateFormDto));
         verify(autorRepository, times(1)).getById(autorUpdateFormDto.getId());
     }
 
     @Test
-    void atualizarDeveriaRetornarAutorAtualizado() {
-        var autorResponse = autorService.atualizar(autorUpdateFormDto);
+    void updateShouldReturnUpdatedAuthorWhenSuccessful() {
+        var autorResponse = autorService.update(autorUpdateFormDto);
 
         assertEquals(autorAtualizado.getId(), autorResponse.getId());
         assertEquals(autorAtualizado.getNome(), autorResponse.getNome());
@@ -115,20 +115,20 @@ class AutorServiceTest {
     }
 
     @Test
-    void deletarDeveriaLancarNotFoundExceptionQuandoIdInvalido() {
-        assertThrows(NotFoundException.class, () -> autorService.deletar(invalidId));
+    void deleteShouldThrowNotFoundExceptionWhenInvalidId() {
+        assertThrows(NotFoundException.class, () -> autorService.delete(invalidId));
         verify(autorRepository, times(1)).deleteById(invalidId);
     }
 
     @Test
-    void deletarDeveriaLancarDomainExceptionQuandoAutorDependente() {
-        assertThrows(DomainException.class, () -> autorService.deletar(dependentId));
+    void deleteShouldThrowDomainExceptionWhenAuthorHasABook() {
+        assertThrows(DomainException.class, () -> autorService.delete(dependentId));
         verify(autorRepository, times(1)).deleteById(dependentId);
     }
 
     @Test
-    void DeleteDeveriaFazerNadaQuandoAutorPodeSerDeletado() {
-        assertDoesNotThrow(() -> autorService.deletar(validId));
+    void deleteShouldDoNothingWhenSuccessful() {
+        assertDoesNotThrow(() -> autorService.delete(validId));
         verify(autorRepository, times(1)).deleteById(validId);
     }
 

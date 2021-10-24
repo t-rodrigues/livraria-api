@@ -28,21 +28,21 @@ public class AutorService {
     private ModelMapper modelMapper = new ModelMapper();
 
     @Transactional(readOnly = true)
-    public Page<AutorResponseDto> listar(Pageable paginacao) {
+    public Page<AutorResponseDto> list(Pageable paginacao) {
         Page<Autor> autores = autorRepository.findAll(paginacao);
 
         return autores.map(autor -> modelMapper.map(autor, AutorResponseDto.class));
     }
 
     @Transactional(readOnly = true)
-    public AutorDetalhadoResponseDto detalhar(Long id) {
+    public AutorDetalhadoResponseDto detail(Long id) {
         var autor = autorRepository.findById(id).orElseThrow(() -> new NotFoundException("Autor inexistente: " + id));
 
         return modelMapper.map(autor, AutorDetalhadoResponseDto.class);
     }
 
     @Transactional
-    public AutorDetalhadoResponseDto criar(AutorFormDto autorFormDto) {
+    public AutorDetalhadoResponseDto create(AutorFormDto autorFormDto) {
         Autor autor = modelMapper.map(autorFormDto, Autor.class);
 
         autorRepository.save(autor);
@@ -51,10 +51,10 @@ public class AutorService {
     }
 
     @Transactional
-    public AutorDetalhadoResponseDto atualizar(AutorUpdateFormDto autorUpdateFormDto) {
+    public AutorDetalhadoResponseDto update(AutorUpdateFormDto autorUpdateFormDto) {
         try {
             var autor = autorRepository.getById(autorUpdateFormDto.getId());
-            atualizarDadosAutor(autor, autorUpdateFormDto);
+            updateAuthorData(autor, autorUpdateFormDto);
 
             autorRepository.save(autor);
 
@@ -64,7 +64,7 @@ public class AutorService {
         }
     }
 
-    public void deletar(Long id) {
+    public void delete(Long id) {
         try {
             autorRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
@@ -74,7 +74,7 @@ public class AutorService {
         }
     }
 
-    private void atualizarDadosAutor(Autor autor, AutorUpdateFormDto autorUpdateFormDto) {
+    private void updateAuthorData(Autor autor, AutorUpdateFormDto autorUpdateFormDto) {
         autor.setNome(autorUpdateFormDto.getNome());
         autor.setEmail(autorUpdateFormDto.getEmail());
         autor.setDataNascimento(autorUpdateFormDto.getDataNascimento());

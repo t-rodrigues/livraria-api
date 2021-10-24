@@ -13,7 +13,7 @@ public class AutorFactory {
     private static ModelMapper modelMapper = new ModelMapper();
 
     public static Autor criarAutor() {
-        return new Autor(1L, "John Doe", "john@mail.com", LocalDate.parse("1990-12-29"), "Curriculo");
+        return new Autor(1L, "John Doe", "john@mail.com", LocalDate.of(2000, 12, 29), "Curriculo");
     }
 
     public static Autor criarAutor(String nome, String email, LocalDate dataNascimento, String miniCurriculo) {
@@ -21,12 +21,11 @@ public class AutorFactory {
     }
 
     public static Autor criarAutorSemId() {
-        return new Autor(null, "John Doe", "john@mail.com", LocalDate.parse("1990-12-29"), "Curriculo");
+        return new Autor(null, "John Doe", "john@mail.com", LocalDate.of(1990, 12, 29), "Curriculo");
     }
 
     public static Autor criarAutorAtualizado() {
-        return new Autor(1L, "Updated John Doe", "updated@mail.com", LocalDate.parse("1990-12-29"),
-                "Updated Curriculo");
+        return new Autor(1L, "Updated John Doe", "updated@mail.com", LocalDate.of(2000, 12, 29), "Updated Curriculo");
     }
 
     public static AutorFormDto criarAutorFormDto() {

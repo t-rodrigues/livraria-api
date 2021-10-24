@@ -35,11 +35,11 @@ class AutorControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @MockBean
     private AutorService autorService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private long existingId = 1L;
     private long nonExistingId = 100L;
@@ -51,27 +51,27 @@ class AutorControllerTest {
         autorDetalhadoResponseDto = AutorFactory.criarAutorDetalhadoResponseDto();
         autorAtualizadoResponseDto = AutorFactory.criarAutorAtualizadoResponseDto();
 
-        when(autorService.detalhar(existingId)).thenReturn(autorDetalhadoResponseDto);
-        when(autorService.detalhar(nonExistingId)).thenThrow(NotFoundException.class);
-        when(autorService.criar(any(AutorFormDto.class))).thenReturn(autorDetalhadoResponseDto);
-        when(autorService.atualizar(any(AutorUpdateFormDto.class))).thenReturn(autorAtualizadoResponseDto);
-        doThrow(NotFoundException.class).when(autorService).deletar(nonExistingId);
-        doNothing().when(autorService).deletar(existingId);
+        when(autorService.detail(existingId)).thenReturn(autorDetalhadoResponseDto);
+        when(autorService.detail(nonExistingId)).thenThrow(NotFoundException.class);
+        when(autorService.create(any(AutorFormDto.class))).thenReturn(autorDetalhadoResponseDto);
+        when(autorService.update(any(AutorUpdateFormDto.class))).thenReturn(autorAtualizadoResponseDto);
+        doThrow(NotFoundException.class).when(autorService).delete(nonExistingId);
+        doNothing().when(autorService).delete(existingId);
     }
 
     @Test
-    void detalharShouldReturnNotFoundWhenInvalidId() throws Exception {
+    void detailShouldReturnNotFoundWhenInvalidId() throws Exception {
         mockMvc.perform(get("/autores/{id}", nonExistingId)).andExpect(status().isNotFound());
     }
 
     @Test
-    void detalharShouldReturnAnAutorWhenIdExists() throws Exception {
+    void detailShouldReturnAnAutorWhenIdExists() throws Exception {
         mockMvc.perform(get("/autores/{id}", existingId)).andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists());
     }
 
     @Test
-    void criarShouldReturnBadRequestWhenInvalidData() throws Exception {
+    void createShouldReturnBadRequestWhenInvalidData() throws Exception {
         String json = "{}";
 
         mockMvc.perform(post("/autores").contentType(MediaType.APPLICATION_JSON).content(json))
@@ -79,7 +79,7 @@ class AutorControllerTest {
     }
 
     @Test
-    void criarShouldReturnAutorWhenValidData() throws Exception {
+    void createShouldReturnAutorWhenValidData() throws Exception {
         var autorFormDto = AutorFactory.criarAutorFormDto();
         String json = objectMapper.writeValueAsString(autorFormDto);
 
@@ -92,8 +92,8 @@ class AutorControllerTest {
     }
 
     @Test
-    void atualizarSholdReturnBadRequestWhenInvalidId() throws Exception {
-        when(autorService.atualizar(any())).thenThrow(DomainException.class);
+    void updateSholdReturnBadRequestWhenInvalidId() throws Exception {
+        when(autorService.update(any())).thenThrow(DomainException.class);
 
         var autorUpdateFormDto = AutorFactory.criarAutorUpdateFormDto();
         autorUpdateFormDto.setId(nonExistingId);
@@ -105,7 +105,7 @@ class AutorControllerTest {
     }
 
     @Test
-    void atualizarShouldReturnUpdatedAutorWhenValidData() throws Exception {
+    void updateShouldReturnUpdatedAutorWhenValidData() throws Exception {
         var autorUpdateFormDto = AutorFactory.criarAutorUpdateFormDto();
         System.out.println(autorUpdateFormDto.getId());
         String json = objectMapper.writeValueAsString(autorUpdateFormDto);
@@ -115,21 +115,21 @@ class AutorControllerTest {
     }
 
     @Test
-    void deletarShouldReturnNotFoundWhenInvalidId() throws Exception {
+    void deleteShouldReturnNotFoundWhenInvalidId() throws Exception {
         mockMvc.perform(delete("/autores/{id}", nonExistingId)).andExpect(status().isNotFound());
     }
 
     @Test
-    void deletarShouldReturnBadRequestWhenAutorHasDependentBook() throws Exception {
+    void deleteShouldReturnBadRequestWhenAutorHasDependentBook() throws Exception {
         long dependentId = 10L;
-        doThrow(DomainException.class).when(autorService).deletar(anyLong());
+        doThrow(DomainException.class).when(autorService).delete(anyLong());
 
         mockMvc.perform(delete("/autores/{id}", dependentId)).andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value(DomainException.class.getSimpleName()));
     }
 
     @Test
-    void deletarShouldReturnNoContentWhenSuccessful() throws Exception {
+    void deleteShouldReturnNoContentWhenSuccessful() throws Exception {
         mockMvc.perform(delete("/autores/{id}", existingId)).andExpect(status().isNoContent());
     }
 

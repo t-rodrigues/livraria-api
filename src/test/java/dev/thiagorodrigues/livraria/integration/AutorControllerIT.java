@@ -3,9 +3,7 @@ package dev.thiagorodrigues.livraria.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.thiagorodrigues.livraria.domain.entities.Autor;
 import dev.thiagorodrigues.livraria.domain.mocks.AutorFactory;
-import dev.thiagorodrigues.livraria.domain.mocks.LivroFactory;
 import dev.thiagorodrigues.livraria.infra.repositories.AutorRepository;
-import dev.thiagorodrigues.livraria.infra.repositories.LivroRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,9 +38,6 @@ class AutorControllerIT {
     private AutorRepository autorRepository;
 
     @Autowired
-    private LivroRepository livroRepository;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
     private long nonExistingId = 10L;
@@ -55,18 +50,18 @@ class AutorControllerIT {
     }
 
     @Test
-    void detalharShouldReturnNotFoundWhenInvalidId() throws Exception {
+    void detailShouldReturnNotFoundWhenInvalidId() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/autores/{id}", nonExistingId)).andExpect(status().isNotFound());
     }
 
     @Test
-    void detalharShouldReturnAutorWhenValidId() throws Exception {
+    void detailShouldReturnAutorWhenValidId() throws Exception {
         mockMvc.perform(get("/autores/{id}", autor.getId())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(autor.getId()));
     }
 
     @Test
-    void criarShouldReturnBadRequestWhenInvalidData() throws Exception {
+    void createShouldReturnBadRequestWhenInvalidData() throws Exception {
         String invalidData = "{}";
 
         mockMvc.perform(post("/autores").contentType(MediaType.APPLICATION_JSON).content(invalidData))
@@ -75,7 +70,7 @@ class AutorControllerIT {
     }
 
     @Test
-    void criarShouldReturnAutorWhenValidData() throws Exception {
+    void createShouldReturnAutorWhenValidData() throws Exception {
         var autorFormDto = AutorFactory.criarAutorFormDto();
         String validData = objectMapper.writeValueAsString(autorFormDto);
 
@@ -85,7 +80,7 @@ class AutorControllerIT {
     }
 
     @Test
-    void atualizarShouldReturnBadRequestWhenInvalidData() throws Exception {
+    void updateShouldReturnBadRequestWhenInvalidData() throws Exception {
         var autorUpdateFormDto = AutorFactory.criarAutorUpdateFormDto();
         autorUpdateFormDto.setId(nonExistingId);
         var invalidData = objectMapper.writeValueAsString(autorUpdateFormDto);
@@ -95,7 +90,7 @@ class AutorControllerIT {
     }
 
     @Test
-    void atualizarShouldUpdateWhenValidData() throws Exception {
+    void updateShouldUpdateWhenValidData() throws Exception {
         var autorUpdateFormDto = AutorFactory.criarAutorUpdateFormDto();
         autorUpdateFormDto.setId(autor.getId());
         var validData = objectMapper.writeValueAsString(autorUpdateFormDto);
@@ -105,21 +100,12 @@ class AutorControllerIT {
     }
 
     @Test
-    void deletarShouldReturnNotFoundWhenInvalidId() throws Exception {
+    void deleteShouldReturnNotFoundWhenInvalidId() throws Exception {
         mockMvc.perform(delete("/autores/{id}", nonExistingId)).andExpect(status().isNotFound());
     }
 
     @Test
-    void deletarShouldReturnBadRequestWhenAutorIsDependent() throws Exception {
-        var livro = LivroFactory.criarLivroSemId();
-        livro.setAutor(autor);
-        livroRepository.save(livro);
-
-        mockMvc.perform(delete("/autores/{id}", autor.getId())).andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void deletarShouldReturnNoContent() throws Exception {
+    void deleteShouldReturnNoContent() throws Exception {
         mockMvc.perform(delete("/autores/{id}", autor.getId())).andExpect(status().isNoContent());
     }
 
