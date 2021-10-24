@@ -1,8 +1,8 @@
 package dev.thiagorodrigues.livraria.application.dtos;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,10 +29,10 @@ public class AutorFormDto {
 
     @Past
     @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy")
-    @JsonAlias("data_nascimento")
+    @JsonProperty("data_nascimento")
     private LocalDate dataNascimento;
 
-    @JsonAlias("mini_curriculo")
+    @JsonProperty("mini_curriculo")
     private String miniCurriculo;
 
 }

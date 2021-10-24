@@ -1,8 +1,8 @@
 package dev.thiagorodrigues.livraria.application.dtos;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,15 +22,15 @@ public class LivroFormDto {
 
     @PastOrPresent
     @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy")
-    @JsonAlias("data_lancamento")
+    @JsonProperty("data_lancamento")
     private LocalDate dataLancamento;
 
     @Min(value = 100)
-    @JsonAlias("numero_paginas")
+    @JsonProperty("numero_paginas")
     private Integer numeroPaginas;
 
     @NotNull
-    @JsonAlias("autor_id")
+    @JsonProperty("autor_id")
     private Long autorId;
 
 }

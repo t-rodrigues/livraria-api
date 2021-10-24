@@ -5,6 +5,8 @@ import dev.thiagorodrigues.livraria.application.dtos.AutorFormDto;
 import dev.thiagorodrigues.livraria.application.dtos.AutorResponseDto;
 import dev.thiagorodrigues.livraria.application.dtos.AutorUpdateFormDto;
 import dev.thiagorodrigues.livraria.domain.services.AutorService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,18 +19,21 @@ import javax.validation.Valid;
 
 import java.net.URI;
 
-@RequiredArgsConstructor
+@Api(tags = "Autores")
 @RestController
 @RequestMapping("/autores")
+@RequiredArgsConstructor
 public class AutorController {
 
     private final AutorService autorService;
 
+    @ApiOperation("Listar autores")
     @GetMapping
     public Page<AutorResponseDto> listar(@PageableDefault(size = 15) Pageable paginacao) {
         return autorService.listar(paginacao);
     }
 
+    @ApiOperation("Detalhar um autor")
     @GetMapping("/{id}")
     public ResponseEntity<AutorDetalhadoResponseDto> detalhar(@PathVariable Long id) {
         var autorDetalhadoResponseDto = autorService.detalhar(id);
@@ -36,6 +41,7 @@ public class AutorController {
         return ResponseEntity.ok(autorDetalhadoResponseDto);
     }
 
+    @ApiOperation("Criar novo autor")
     @PostMapping
     public ResponseEntity<AutorDetalhadoResponseDto> criar(@RequestBody @Valid AutorFormDto autorFormDto,
             UriComponentsBuilder uriComponentsBuilder) {
@@ -46,6 +52,7 @@ public class AutorController {
         return ResponseEntity.created(location).body(autorResponseDto);
     }
 
+    @ApiOperation("Atualizar autor")
     @PutMapping
     public ResponseEntity<AutorDetalhadoResponseDto> atualizar(
             @RequestBody @Valid AutorUpdateFormDto autorUpdateFormDto) {
@@ -54,6 +61,7 @@ public class AutorController {
         return ResponseEntity.ok(autorDetalhadoResponseDto);
     }
 
+    @ApiOperation("Deletar autor")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         autorService.deletar(id);
