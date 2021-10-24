@@ -28,14 +28,14 @@ public class LivroService {
     private final AutorRepository autorRepository;
 
     @Transactional(readOnly = true)
-    public Page<LivroResponseDto> listar(Pageable paginacao) {
+    public Page<LivroResponseDto> list(Pageable paginacao) {
         var livros = livroRepository.findAll(paginacao);
 
         return livros.map(livro -> modelMapper.map(livro, LivroResponseDto.class));
     }
 
     @Transactional(readOnly = true)
-    public LivroResponseDto detalhar(Long id) {
+    public LivroResponseDto detail(Long id) {
         var livro = livroRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Livro não encontrado: " + id));
 
@@ -43,7 +43,7 @@ public class LivroService {
     }
 
     @Transactional
-    public LivroResponseDto criar(LivroFormDto livroFormDto) {
+    public LivroResponseDto create(LivroFormDto livroFormDto) {
         try {
             var livro = modelMapper.map(livroFormDto, Livro.class);
             livro.setId(null);
@@ -58,11 +58,11 @@ public class LivroService {
     }
 
     @Transactional
-    public LivroResponseDto atualizar(LivroUpdateFormDto livroUpdateFormDto) {
+    public LivroResponseDto update(LivroUpdateFormDto livroUpdateFormDto) {
         try {
             var livro = livroRepository.getById(livroUpdateFormDto.getId());
 
-            atualizarDados(livro, livroUpdateFormDto);
+            updateBookData(livro, livroUpdateFormDto);
             livroRepository.save(livro);
 
             return modelMapper.map(livro, LivroResponseDto.class);
@@ -71,7 +71,15 @@ public class LivroService {
         }
     }
 
-    private void atualizarDados(Livro livro, LivroUpdateFormDto livroUpdateFormDto) {
+    public void delete(Long id) {
+        try {
+            livroRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new NotFoundException("Livro inexistente");
+        }
+    }
+
+    private void updateBookData(Livro livro, LivroUpdateFormDto livroUpdateFormDto) {
         var autor = autorRepository.findById(livroUpdateFormDto.getAutorId())
                 .orElseThrow(() -> new DomainException("Autor inexistente"));
 
@@ -79,14 +87,6 @@ public class LivroService {
         livro.setDataLancamento(livroUpdateFormDto.getDataLancamento());
         livro.setNumeroPaginas(livroUpdateFormDto.getNumeroPaginas());
         livro.setAutor(autor);
-    }
-
-    public void deletar(Long id) {
-        try {
-            livroRepository.deleteById(id);
-        } catch (Exception e) {
-            throw new NotFoundException("Livro inexistente");
-        }
     }
 
 }

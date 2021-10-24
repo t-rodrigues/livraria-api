@@ -58,18 +58,18 @@ class LivroControllerIT {
     }
 
     @Test
-    void detalharShouldReturnNotFoundWhenInvalidId() throws Exception {
+    void detailShouldReturnNotFoundWhenInvalidId() throws Exception {
         mockMvc.perform(get("/livros/{id}", nonExistingId)).andExpect(status().isNotFound());
     }
 
     @Test
-    void detalharShouldReturnLivroWhenValidId() throws Exception {
+    void detailShouldReturnBookWhenValidId() throws Exception {
         mockMvc.perform(get("/livros/{id}", livro.getId())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(livro.getId()));
     }
 
     @Test
-    void criarShouldReturnBadRequestWhenInvalidData() throws Exception {
+    void createShouldReturnBadRequestWhenInvalidData() throws Exception {
         var invalidData = "{}";
 
         mockMvc.perform(post("/livros").contentType(MediaType.APPLICATION_JSON).content(invalidData))
@@ -77,7 +77,7 @@ class LivroControllerIT {
     }
 
     @Test
-    void criarShouldReturnLivroWhenValidData() throws Exception {
+    void createShouldReturnBookWhenValidData() throws Exception {
         var livroFormDto = LivroFactory.criarLivroFormDto();
         livroFormDto.setAutorId(autor.getId());
         var validData = objectMapper.writeValueAsString(livroFormDto);
@@ -88,7 +88,7 @@ class LivroControllerIT {
     }
 
     @Test
-    void atualizarShouldReturnBadRequestWhenInvalidData() throws Exception {
+    void updateShouldReturnBadRequestWhenInvalidData() throws Exception {
         var livroUpdateFormDto = LivroFactory.criarLivroUpdateFormDto();
         livroUpdateFormDto.setId(nonExistingId);
         var invalidData = objectMapper.writeValueAsString(livroUpdateFormDto);
@@ -98,7 +98,7 @@ class LivroControllerIT {
     }
 
     @Test
-    void atualizarShouldReturnUpdateLivroWhenValidData() throws Exception {
+    void updateShouldReturnUpdatedBookWhenValidData() throws Exception {
         var livroUpdateFormDto = LivroFactory.criarLivroUpdateFormDto();
         livroUpdateFormDto.setId(livro.getId());
         livroUpdateFormDto.setAutorId(autor.getId());
@@ -109,12 +109,12 @@ class LivroControllerIT {
     }
 
     @Test
-    void deletarShouldReturnNotFoundWhenInvalidId() throws Exception {
+    void deleteShouldReturnNotFoundWhenInvalidId() throws Exception {
         mockMvc.perform(delete("/livros/{id}", nonExistingId)).andExpect(status().isNotFound());
     }
 
     @Test
-    void deletarShouldReturnNoContentWhenSuccessful() throws Exception {
+    void deleteShouldReturnNoContentWhenSuccessful() throws Exception {
         mockMvc.perform(delete("/livros/{id}", livro.getId())).andExpect(status().isNoContent());
     }
 

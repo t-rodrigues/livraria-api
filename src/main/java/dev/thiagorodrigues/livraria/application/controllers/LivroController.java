@@ -28,23 +28,23 @@ public class LivroController {
 
     @ApiOperation("Listar livros")
     @GetMapping
-    public Page<LivroResponseDto> listar(@PageableDefault(sort = "titulo", size = 15) Pageable paginacao) {
-        return livroService.listar(paginacao);
+    public Page<LivroResponseDto> list(@PageableDefault(sort = "titulo", size = 15) Pageable paginacao) {
+        return livroService.list(paginacao);
     }
 
     @ApiOperation("Detalhar livro")
     @GetMapping("/{id}")
-    public ResponseEntity<LivroResponseDto> detalhar(@PathVariable Long id) {
-        LivroResponseDto livro = livroService.detalhar(id);
+    public ResponseEntity<LivroResponseDto> detail(@PathVariable Long id) {
+        LivroResponseDto livro = livroService.detail(id);
 
         return ResponseEntity.ok(livro);
     }
 
     @ApiOperation("Cadastrar novo livro")
     @PostMapping
-    public ResponseEntity<LivroResponseDto> criar(@RequestBody @Valid LivroFormDto livroFormDto,
+    public ResponseEntity<LivroResponseDto> create(@RequestBody @Valid LivroFormDto livroFormDto,
             UriComponentsBuilder uriComponentsBuilder) {
-        LivroResponseDto livro = livroService.criar(livroFormDto);
+        LivroResponseDto livro = livroService.create(livroFormDto);
 
         URI location = uriComponentsBuilder.path("/livros/{id}").buildAndExpand(livro.getId()).toUri();
 
@@ -53,16 +53,16 @@ public class LivroController {
 
     @ApiOperation("Atualizar livro")
     @PutMapping
-    public ResponseEntity<LivroResponseDto> atualizar(@RequestBody @Valid LivroUpdateFormDto livroUpdateFormDto) {
-        LivroResponseDto livroResponseDto = livroService.atualizar(livroUpdateFormDto);
+    public ResponseEntity<LivroResponseDto> update(@RequestBody @Valid LivroUpdateFormDto livroUpdateFormDto) {
+        LivroResponseDto livroResponseDto = livroService.update(livroUpdateFormDto);
 
         return ResponseEntity.ok(livroResponseDto);
     }
 
     @ApiOperation("Deletar livro")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        livroService.deletar(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        livroService.delete(id);
 
         return ResponseEntity.noContent().build();
     }

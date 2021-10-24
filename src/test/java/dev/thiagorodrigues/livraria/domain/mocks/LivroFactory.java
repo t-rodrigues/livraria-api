@@ -14,11 +14,11 @@ public class LivroFactory {
     private static ModelMapper modelMapper = new ModelMapper();
 
     public static Livro criarLivro() {
-        return new Livro(1L, "Lorem Ipsum", LocalDate.parse("2020-12-20"), 100, AutorFactory.criarAutor());
+        return new Livro(1L, "Lorem Ipsum", LocalDate.of(2020, 12, 20), 100, AutorFactory.criarAutor());
     }
 
     public static Livro criarLivroSemId() {
-        return new Livro(null, "Lorem Ipsum", LocalDate.parse("2020-12-20"), 100, AutorFactory.criarAutor());
+        return new Livro(null, "Lorem Ipsum", LocalDate.of(2020, 12, 20), 100, AutorFactory.criarAutor());
     }
 
     public static Livro criarLivro(String titulo, LocalDate dataLancamento, Integer numeroPaginas, Autor autor) {
@@ -26,7 +26,7 @@ public class LivroFactory {
     }
 
     public static Livro criarLivroAtualizado() {
-        return new Livro(1L, "Updated Lorem Ipsum", LocalDate.parse("2021-10-20"), 120, AutorFactory.criarAutor());
+        return new Livro(1L, "Updated Lorem Ipsum", LocalDate.of(2021, 10, 20), 120, AutorFactory.criarAutor());
     }
 
     public static LivroResponseDto criarLivroResponseDto() {

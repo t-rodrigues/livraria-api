@@ -53,12 +53,12 @@ class LivroControllerTest {
         livroFormDto = LivroFactory.criarLivroFormDto();
         livroUpdateFormDto = LivroFactory.criarLivroUpdateFormDto();
 
-        when(livroService.detalhar(existingId)).thenReturn(livroResponseDto);
-        when(livroService.detalhar(nonExistingId)).thenThrow(NotFoundException.class);
-        when(livroService.criar(any(LivroFormDto.class))).thenReturn(livroResponseDto);
-        when(livroService.atualizar(any(LivroUpdateFormDto.class))).thenReturn(livroAtualizaResponseDto);
-        doThrow(NotFoundException.class).when(livroService).deletar(nonExistingId);
-        doNothing().when(livroService).deletar(existingId);
+        when(livroService.detail(existingId)).thenReturn(livroResponseDto);
+        when(livroService.detail(nonExistingId)).thenThrow(NotFoundException.class);
+        when(livroService.create(any(LivroFormDto.class))).thenReturn(livroResponseDto);
+        when(livroService.update(any(LivroUpdateFormDto.class))).thenReturn(livroAtualizaResponseDto);
+        doThrow(NotFoundException.class).when(livroService).delete(nonExistingId);
+        doNothing().when(livroService).delete(existingId);
     }
 
     @Test

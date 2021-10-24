@@ -55,7 +55,7 @@ class AutorControllerIT {
     }
 
     @Test
-    void detailShouldReturnAutorWhenValidId() throws Exception {
+    void detailShouldReturnAuthorWhenValidId() throws Exception {
         mockMvc.perform(get("/autores/{id}", autor.getId())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(autor.getId()));
     }
@@ -70,7 +70,7 @@ class AutorControllerIT {
     }
 
     @Test
-    void createShouldReturnAutorWhenValidData() throws Exception {
+    void createShouldReturnAuthorWhenValidData() throws Exception {
         var autorFormDto = AutorFactory.criarAutorFormDto();
         String validData = objectMapper.writeValueAsString(autorFormDto);
 
