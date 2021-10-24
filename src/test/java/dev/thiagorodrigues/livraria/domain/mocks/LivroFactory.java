@@ -17,6 +17,10 @@ public class LivroFactory {
         return new Livro(1L, "Lorem Ipsum", LocalDate.parse("2020-12-20"), 100, AutorFactory.criarAutor());
     }
 
+    public static Livro criarLivroSemId() {
+        return new Livro(null, "Lorem Ipsum", LocalDate.parse("2020-12-20"), 100, AutorFactory.criarAutor());
+    }
+
     public static Livro criarLivro(String titulo, LocalDate dataLancamento, Integer numeroPaginas, Autor autor) {
         return new Livro(null, titulo, dataLancamento, numeroPaginas, autor);
     }
