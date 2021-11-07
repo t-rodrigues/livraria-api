@@ -17,7 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -72,7 +71,7 @@ class AutorControllerTest {
 
     @Test
     void createShouldReturnBadRequestWhenInvalidData() throws Exception {
-        String json = "{}";
+        var json = "{}";
 
         mockMvc.perform(post("/autores").contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isBadRequest());
@@ -81,7 +80,7 @@ class AutorControllerTest {
     @Test
     void createShouldReturnAuthorWhenValidData() throws Exception {
         var autorFormDto = AutorFactory.criarAutorFormDto();
-        String json = objectMapper.writeValueAsString(autorFormDto);
+        var json = objectMapper.writeValueAsString(autorFormDto);
 
         mockMvc.perform(post("/autores").contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isCreated()).andExpect(header().exists("Location"))
@@ -97,7 +96,7 @@ class AutorControllerTest {
 
         var autorUpdateFormDto = AutorFactory.criarAutorUpdateFormDto();
         autorUpdateFormDto.setId(nonExistingId);
-        String json = objectMapper.writeValueAsString(autorUpdateFormDto);
+        var json = objectMapper.writeValueAsString(autorUpdateFormDto);
 
         mockMvc.perform(put("/autores").contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isBadRequest())
@@ -107,8 +106,7 @@ class AutorControllerTest {
     @Test
     void updateShouldReturnUpdatedAuthorWhenValidData() throws Exception {
         var autorUpdateFormDto = AutorFactory.criarAutorUpdateFormDto();
-        System.out.println(autorUpdateFormDto.getId());
-        String json = objectMapper.writeValueAsString(autorUpdateFormDto);
+        var json = objectMapper.writeValueAsString(autorUpdateFormDto);
 
         mockMvc.perform(put("/autores").contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isOk());
@@ -121,8 +119,8 @@ class AutorControllerTest {
 
     @Test
     void deleteShouldReturnBadRequestWhenAutorHasDependentBook() throws Exception {
-        long dependentId = 10L;
-        doThrow(DomainException.class).when(autorService).delete(anyLong());
+        var dependentId = 10L;
+        doThrow(DomainException.class).when(autorService).delete(dependentId);
 
         mockMvc.perform(delete("/autores/{id}", dependentId)).andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value(DomainException.class.getSimpleName()));
