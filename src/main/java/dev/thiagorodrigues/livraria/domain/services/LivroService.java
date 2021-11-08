@@ -46,7 +46,6 @@ public class LivroService {
     public LivroResponseDto create(LivroFormDto livroFormDto) {
         try {
             var livro = modelMapper.map(livroFormDto, Livro.class);
-            livro.setId(null);
             livro.setAutor(autorRepository.getById(livroFormDto.getAutorId()));
 
             livroRepository.save(livro);

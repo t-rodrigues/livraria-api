@@ -3,17 +3,20 @@ package dev.thiagorodrigues.livraria.application.controllers;
 import dev.thiagorodrigues.livraria.application.dtos.UsuarioFormDto;
 import dev.thiagorodrigues.livraria.application.dtos.UsuarioResponseDto;
 import dev.thiagorodrigues.livraria.application.dtos.UsuarioUpdateFormDto;
+import dev.thiagorodrigues.livraria.domain.entities.Usuario;
 import dev.thiagorodrigues.livraria.domain.services.UsuarioService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 
-@Api(tags = "Usuarios")
+@Api(tags = "Usuários")
 @RestController
 @RequestMapping("/usuarios")
 @RequiredArgsConstructor
@@ -29,10 +32,10 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioResponseDto);
     }
 
-    @ApiOperation("Detalhar um usuário")
-    @GetMapping("/{id}")
-    public ResponseEntity<UsuarioResponseDto> detail(@PathVariable Long id) {
-        var userResponseDto = this.usuarioService.detail(id);
+    @ApiOperation("Detalhar usuário")
+    @GetMapping("/perfil")
+    public ResponseEntity<UsuarioResponseDto> detail(@ApiIgnore @AuthenticationPrincipal Usuario usuario) {
+        var userResponseDto = this.usuarioService.detail(usuario.getId());
 
         return ResponseEntity.ok(userResponseDto);
     }

@@ -9,3 +9,6 @@ spring:
     properties:
       hibernate:
         '[format_sql]': true
+
+jwt:
+  secret: JWT_SUPER_SECRET

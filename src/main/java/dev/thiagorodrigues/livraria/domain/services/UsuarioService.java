@@ -6,10 +6,15 @@ import dev.thiagorodrigues.livraria.application.dtos.UsuarioUpdateFormDto;
 import dev.thiagorodrigues.livraria.domain.entities.Usuario;
 import dev.thiagorodrigues.livraria.domain.exceptions.DomainException;
 import dev.thiagorodrigues.livraria.domain.exceptions.NotFoundException;
+import dev.thiagorodrigues.livraria.infra.repositories.PerfilRepository;
 import dev.thiagorodrigues.livraria.infra.repositories.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,9 +22,11 @@ import javax.persistence.EntityNotFoundException;
 
 @Service
 @RequiredArgsConstructor
-public class UsuarioService {
+public class UsuarioService implements UserDetailsService {
 
     private final UsuarioRepository usuarioRepository;
+    private final PerfilRepository perfilRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final ModelMapper modelMapper;
 
     @Transactional(readOnly = true)
@@ -31,15 +38,21 @@ public class UsuarioService {
 
     @Transactional
     public UsuarioResponseDto create(UsuarioFormDto usuarioFormDto) {
-        var usuario = modelMapper.map(usuarioFormDto, Usuario.class);
+        try {
+            var usuario = modelMapper.map(usuarioFormDto, Usuario.class);
 
-        if (checkIfEmailAlreadyTaken(usuario.getEmail())) {
-            throw new DomainException("Email already in use");
+            if (checkIfEmailAlreadyTaken(usuario.getEmail())) {
+                throw new DomainException("Email already in use");
+            }
+
+            usuario.setSenha(bCryptPasswordEncoder.encode(usuarioFormDto.getSenha()));
+            usuario.adicionarPerfil(perfilRepository.getByNome("ROLE_USER"));
+            this.usuarioRepository.save(usuario);
+
+            return modelMapper.map(usuario, UsuarioResponseDto.class);
+        } catch (Exception e) {
+            throw new DomainException(e.getMessage());
         }
-
-        this.usuarioRepository.save(usuario);
-
-        return modelMapper.map(usuario, UsuarioResponseDto.class);
     }
 
     @Transactional
@@ -67,6 +80,12 @@ public class UsuarioService {
         } catch (EmptyResultDataAccessException e) {
             throw new NotFoundException("User not found");
         }
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return this.usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     private void updateData(Usuario usuario, UsuarioUpdateFormDto usuarioUpdateFormDto) {
