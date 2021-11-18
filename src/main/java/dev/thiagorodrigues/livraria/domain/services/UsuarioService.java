@@ -6,6 +6,7 @@ import dev.thiagorodrigues.livraria.application.dtos.UsuarioUpdateFormDto;
 import dev.thiagorodrigues.livraria.domain.entities.Usuario;
 import dev.thiagorodrigues.livraria.domain.exceptions.DomainException;
 import dev.thiagorodrigues.livraria.domain.exceptions.NotFoundException;
+import dev.thiagorodrigues.livraria.infra.providers.mail.MailService;
 import dev.thiagorodrigues.livraria.infra.repositories.PerfilRepository;
 import dev.thiagorodrigues.livraria.infra.repositories.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class UsuarioService implements UserDetailsService {
     private final PerfilRepository perfilRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final ModelMapper modelMapper;
+    private final MailService mailService;
 
     @Transactional(readOnly = true)
     public UsuarioResponseDto detail(Long id) {
@@ -47,6 +49,7 @@ public class UsuarioService implements UserDetailsService {
 
             usuario.setSenha(bCryptPasswordEncoder.encode(usuarioFormDto.getSenha()));
             usuario.adicionarPerfil(perfilRepository.getByNome("ROLE_USER"));
+            sendEmail(usuario);
             this.usuarioRepository.save(usuario);
 
             return modelMapper.map(usuario, UsuarioResponseDto.class);
@@ -95,6 +98,17 @@ public class UsuarioService implements UserDetailsService {
 
     private boolean checkIfEmailAlreadyTaken(String email) {
         return this.usuarioRepository.existsByEmail(email);
+    }
+
+    private void sendEmail(Usuario usuario) {
+        var recipient = String.format("%s <%s>", usuario.getNome(), usuario.getEmail());
+        var subject = "Livraria - Bem vindo(a)";
+        var content = String.format("Olá, %s!\n\n" + "Seu cadastro foi realizado com sucesso!"
+                + "\n\nPara acessar sua conta no Sistema Livraria:"
+                + "\nLogin: %s\nSenha: informada no momento do cadastro.\n\n" + "Atenciosamente,\nEquipe Livraria.",
+                usuario.getNome(), usuario.getEmail());
+
+        this.mailService.sendMail(recipient, subject, content);
     }
 
 }
