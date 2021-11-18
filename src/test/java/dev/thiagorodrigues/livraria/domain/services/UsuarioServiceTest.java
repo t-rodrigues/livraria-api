@@ -7,6 +7,7 @@ import dev.thiagorodrigues.livraria.domain.entities.Usuario;
 import dev.thiagorodrigues.livraria.domain.exceptions.DomainException;
 import dev.thiagorodrigues.livraria.domain.exceptions.NotFoundException;
 import dev.thiagorodrigues.livraria.domain.mocks.UsuarioFactory;
+import dev.thiagorodrigues.livraria.infra.providers.mail.MailService;
 import dev.thiagorodrigues.livraria.infra.repositories.PerfilRepository;
 import dev.thiagorodrigues.livraria.infra.repositories.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +49,9 @@ class UsuarioServiceTest {
 
     @Mock
     private ModelMapper modelMapper;
+
+    @Mock
+    private MailService mailService;
 
     @InjectMocks
     private UsuarioService usuarioService;
