@@ -3,6 +3,7 @@ package dev.thiagorodrigues.livraria.application.controllers;
 import dev.thiagorodrigues.livraria.application.dtos.UsuarioFormDto;
 import dev.thiagorodrigues.livraria.application.dtos.UsuarioResponseDto;
 import dev.thiagorodrigues.livraria.application.dtos.UsuarioUpdateFormDto;
+import dev.thiagorodrigues.livraria.application.dtos.UsuarioUpdateProfileDto;
 import dev.thiagorodrigues.livraria.domain.entities.Usuario;
 import dev.thiagorodrigues.livraria.domain.services.UsuarioService;
 import io.swagger.annotations.Api;
@@ -44,6 +45,15 @@ public class UsuarioController {
     @PutMapping
     public ResponseEntity<UsuarioResponseDto> update(@RequestBody @Valid UsuarioUpdateFormDto usuarioUpdateFormDto) {
         var userResponseDto = this.usuarioService.update(usuarioUpdateFormDto);
+
+        return ResponseEntity.ok(userResponseDto);
+    }
+
+    @ApiOperation("Atualizar permissões")
+    @PatchMapping
+    public ResponseEntity<UsuarioResponseDto> updateProfile(
+            @RequestBody @Valid UsuarioUpdateProfileDto usuarioUpdateProfileDto) {
+        var userResponseDto = this.usuarioService.updateProfiles(usuarioUpdateProfileDto);
 
         return ResponseEntity.ok(userResponseDto);
     }

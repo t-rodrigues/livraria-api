@@ -3,9 +3,11 @@ package dev.thiagorodrigues.livraria.domain.services;
 import dev.thiagorodrigues.livraria.application.dtos.UsuarioFormDto;
 import dev.thiagorodrigues.livraria.application.dtos.UsuarioResponseDto;
 import dev.thiagorodrigues.livraria.application.dtos.UsuarioUpdateFormDto;
+import dev.thiagorodrigues.livraria.application.dtos.UsuarioUpdateProfileDto;
 import dev.thiagorodrigues.livraria.domain.entities.Usuario;
 import dev.thiagorodrigues.livraria.domain.exceptions.DomainException;
 import dev.thiagorodrigues.livraria.domain.exceptions.NotFoundException;
+import dev.thiagorodrigues.livraria.domain.mocks.PerfilFactory;
 import dev.thiagorodrigues.livraria.domain.mocks.UsuarioFactory;
 import dev.thiagorodrigues.livraria.infra.providers.mail.MailService;
 import dev.thiagorodrigues.livraria.infra.repositories.PerfilRepository;
@@ -29,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -64,7 +67,9 @@ class UsuarioServiceTest {
     private UsuarioFormDto usuarioFormDto;
     private UsuarioResponseDto usuarioResponseDto;
     private UsuarioResponseDto usuarioUpdatedResponseDto;
+    private UsuarioResponseDto usuarioUpdatedWithProfilesResponseDto;
     private UsuarioUpdateFormDto usuarioUpdateFormDto;
+    private UsuarioUpdateProfileDto usuarioUpdateProfileDto;
 
     @BeforeEach
     void setUp() {
@@ -72,8 +77,11 @@ class UsuarioServiceTest {
         usuarioUpdated = UsuarioFactory.createUpdatedUser();
         usuarioFormDto = UsuarioFactory.createUserFormDto();
         usuarioResponseDto = UsuarioFactory.createUserResponseDto();
+        usuarioResponseDto = UsuarioFactory.createUserResponseDto();
         usuarioUpdatedResponseDto = UsuarioFactory.createUserUpdatedResponseDto();
         usuarioUpdateFormDto = UsuarioFactory.createUserUpdateFormDto();
+        usuarioUpdateProfileDto = UsuarioFactory.createUsuarioUpdateProfilesDto();
+        usuarioUpdatedWithProfilesResponseDto = UsuarioFactory.createUpdatedUserWithProfilesResponseDto();
     }
 
     @Test
@@ -157,6 +165,24 @@ class UsuarioServiceTest {
 
         assertEquals(usuarioUpdateFormDto.getEmail(), response.getEmail());
         assertEquals(usuarioUpdateFormDto.getNome(), response.getNome());
+    }
+
+    @Test
+    void updateProfileShouldThrowDomainExceptionWhenInvalidUserId() {
+        when(usuarioRepository.getById(anyLong())).thenThrow(EntityNotFoundException.class);
+
+        assertThrows(DomainException.class, () -> this.usuarioService.updateProfiles(usuarioUpdateProfileDto));
+    }
+
+    @Test
+    void udpateProfileShouldReturnUpdatedUserWhenValidData() {
+        when(usuarioRepository.getById(anyLong())).thenReturn(usuario);
+        when(perfilRepository.findAllById(anyList())).thenReturn(PerfilFactory.createListPerfis());
+        when(modelMapper.map(usuario, UsuarioResponseDto.class)).thenReturn(usuarioUpdatedWithProfilesResponseDto);
+
+        var response = this.usuarioService.updateProfiles(usuarioUpdateProfileDto);
+
+        assertEquals(2, response.getPerfis().size());
     }
 
 }

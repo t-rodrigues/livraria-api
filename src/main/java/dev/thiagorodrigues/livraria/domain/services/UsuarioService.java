@@ -3,6 +3,7 @@ package dev.thiagorodrigues.livraria.domain.services;
 import dev.thiagorodrigues.livraria.application.dtos.UsuarioFormDto;
 import dev.thiagorodrigues.livraria.application.dtos.UsuarioResponseDto;
 import dev.thiagorodrigues.livraria.application.dtos.UsuarioUpdateFormDto;
+import dev.thiagorodrigues.livraria.application.dtos.UsuarioUpdateProfileDto;
 import dev.thiagorodrigues.livraria.domain.entities.Usuario;
 import dev.thiagorodrigues.livraria.domain.exceptions.DomainException;
 import dev.thiagorodrigues.livraria.domain.exceptions.NotFoundException;
@@ -74,6 +75,22 @@ public class UsuarioService implements UserDetailsService {
             return modelMapper.map(usuario, UsuarioResponseDto.class);
         } catch (EntityNotFoundException e) {
             throw new DomainException("Invalid user data");
+        }
+    }
+
+    @Transactional
+    public UsuarioResponseDto updateProfiles(UsuarioUpdateProfileDto updateProfileDto) {
+        try {
+            var usuario = this.usuarioRepository.getById(updateProfileDto.getId());
+
+            usuario.getPerfis().clear();
+            var perfis = this.perfilRepository.findAllById(updateProfileDto.getProfiles());
+            perfis.forEach(usuario::adicionarPerfil);
+            this.usuarioRepository.save(usuario);
+
+            return modelMapper.map(usuario, UsuarioResponseDto.class);
+        } catch (EntityNotFoundException e) {
+            throw new DomainException("User not found");
         }
     }
 

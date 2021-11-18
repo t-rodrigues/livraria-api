@@ -38,9 +38,15 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().antMatchers(HttpMethod.POST, "/auth").permitAll()
-                .antMatchers(HttpMethod.POST, "/usuarios").permitAll().antMatchers(HttpMethod.PATCH, "/usuarios")
-                .hasAnyRole("ADMIN").anyRequest().authenticated().and().sessionManagement()
+        http.authorizeRequests()
+
+                .antMatchers(HttpMethod.POST, "/auth").permitAll()
+
+                .antMatchers(HttpMethod.POST, "/usuarios").permitAll()
+
+                .antMatchers("/usuarios").hasAnyRole("ADMIN")
+
+                .anyRequest().authenticated().and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().csrf().disable()
                 .addFilterBefore(new TokenAuthenticationFilter(jwtTokenUtils, usuarioRepository),
                         UsernamePasswordAuthenticationFilter.class);

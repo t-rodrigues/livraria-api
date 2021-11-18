@@ -19,10 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -48,17 +45,29 @@ class UsuarioControllerIT {
     private ObjectMapper objectMapper;
 
     private long nonExistingId = 100L;
-    private String accessToken;
+    private String adminAccessToken;
+    private String userAccessToken;
     private Usuario usuario;
 
     @BeforeEach
     void setup() {
-        accessToken = getAccessToken();
+        adminAccessToken = getAdminAccessToken();
+        userAccessToken = getAccessToken();
+    }
+
+    private String getAdminAccessToken() {
+        usuario = new Usuario(null, "Admin", "admin@mail.com", "SuperSecret123");
+        usuario.adicionarPerfil(perfilRepository.getByNome("ROLE_ADMIN"));
+        usuarioRepository.save(usuario);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(usuario, usuario.getEmail());
+        usuario = (Usuario) authentication.getPrincipal();
+
+        return "Bearer " + jwtTokenUtils.generateJwtToken(usuario.getId().toString());
     }
 
     private String getAccessToken() {
-        usuario = new Usuario(null, "Admin", "admin@mail.com", "SuperSecret123");
-        usuario.adicionarPerfil(perfilRepository.getByNome("ROLE_ADMIN"));
+        usuario = new Usuario(null, "User", "user@mail.com", "SuperSecret123");
+        usuario.adicionarPerfil(perfilRepository.getByNome("ROLE_USER"));
         usuarioRepository.save(usuario);
         Authentication authentication = new UsernamePasswordAuthenticationToken(usuario, usuario.getEmail());
         usuario = (Usuario) authentication.getPrincipal();
@@ -70,7 +79,7 @@ class UsuarioControllerIT {
     void createShouldReturnBadRequestWhenInvalidData() throws Exception {
         String invalidData = "{}";
 
-        mockMvc.perform(post("/usuarios").header(HttpHeaders.AUTHORIZATION, accessToken)
+        mockMvc.perform(post("/usuarios").header(HttpHeaders.AUTHORIZATION, adminAccessToken)
                 .contentType(MediaType.APPLICATION_JSON).content(invalidData)).andExpect(status().isBadRequest());
     }
 
@@ -79,7 +88,7 @@ class UsuarioControllerIT {
         var usuarioFormDto = UsuarioFactory.createUserFormDto();
         var validData = objectMapper.writeValueAsString(usuarioFormDto);
 
-        mockMvc.perform(post("/usuarios").header(HttpHeaders.AUTHORIZATION, accessToken)
+        mockMvc.perform(post("/usuarios").header(HttpHeaders.AUTHORIZATION, adminAccessToken)
                 .contentType(MediaType.APPLICATION_JSON).content(validData)).andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists());
     }
@@ -90,7 +99,7 @@ class UsuarioControllerIT {
         usuarioUpdateFormDto.setId(nonExistingId);
         var invalidData = objectMapper.writeValueAsString(usuarioUpdateFormDto);
 
-        mockMvc.perform(put("/usuarios").header(HttpHeaders.AUTHORIZATION, accessToken)
+        mockMvc.perform(put("/usuarios").header(HttpHeaders.AUTHORIZATION, adminAccessToken)
                 .contentType(MediaType.APPLICATION_JSON).content(invalidData)).andExpect(status().isBadRequest());
     }
 
@@ -100,7 +109,7 @@ class UsuarioControllerIT {
         updateFormDto.setId(usuario.getId());
         var validData = objectMapper.writeValueAsString(updateFormDto);
 
-        mockMvc.perform(put("/usuarios").header(HttpHeaders.AUTHORIZATION, accessToken)
+        mockMvc.perform(put("/usuarios").header(HttpHeaders.AUTHORIZATION, adminAccessToken)
                 .contentType(MediaType.APPLICATION_JSON).content(validData)).andExpect(status().isOk())
                 .andExpect(jsonPath("$.nome").value(updateFormDto.getNome()))
                 .andExpect(jsonPath("$.email").value(updateFormDto.getEmail()));
@@ -108,20 +117,39 @@ class UsuarioControllerIT {
 
     @Test
     void detailShouldReturnUserWhenValidId() throws Exception {
-        mockMvc.perform(get("/usuarios/perfil").header(HttpHeaders.AUTHORIZATION, accessToken))
+        mockMvc.perform(get("/usuarios/perfil").header(HttpHeaders.AUTHORIZATION, adminAccessToken))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.id").exists());
     }
 
     @Test
     void deleteShouldReturnNotFoundWhenInvalidId() throws Exception {
-        mockMvc.perform(delete("/usuarios/{id}", nonExistingId).header(HttpHeaders.AUTHORIZATION, accessToken))
+        mockMvc.perform(delete("/usuarios/{id}", nonExistingId).header(HttpHeaders.AUTHORIZATION, adminAccessToken))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void deleteShouldReturnNoContentWhenSuccessFull() throws Exception {
-        mockMvc.perform(delete("/usuarios/{id}", usuario.getId()).header(HttpHeaders.AUTHORIZATION, accessToken))
+        mockMvc.perform(delete("/usuarios/{id}", usuario.getId()).header(HttpHeaders.AUTHORIZATION, adminAccessToken))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void updateProfileShouldReturnForbiddenWhenCommonUser() throws Exception {
+        var updateProfilesFormDto = UsuarioFactory.createUsuarioUpdateProfilesDto();
+        var validData = objectMapper.writeValueAsString(updateProfilesFormDto);
+
+        mockMvc.perform(patch("/usuarios").header(HttpHeaders.AUTHORIZATION, userAccessToken)
+                .contentType(MediaType.APPLICATION_JSON).content(validData)).andExpect(status().isForbidden());
+    }
+
+    @Test
+    void updateProfileShouldReturnUpdatedUserWhenAdmin() throws Exception {
+        var updateProfilesFormDto = UsuarioFactory.createUsuarioUpdateProfilesDto();
+        updateProfilesFormDto.setId(usuario.getId());
+        var validData = objectMapper.writeValueAsString(updateProfilesFormDto);
+
+        mockMvc.perform(patch("/usuarios").header(HttpHeaders.AUTHORIZATION, adminAccessToken)
+                .contentType(MediaType.APPLICATION_JSON).content(validData)).andExpect(status().isOk());
     }
 
 }
