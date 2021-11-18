@@ -5,6 +5,7 @@ import dev.thiagorodrigues.livraria.domain.exceptions.DomainException;
 import dev.thiagorodrigues.livraria.domain.exceptions.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -23,6 +24,13 @@ public class ExceptionsHandler {
         ex.getFieldErrors().forEach(f -> error.addValidationError(f.getField(), f.getDefaultMessage()));
 
         return ResponseEntity.status(error.getStatus()).body(error);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException ex,
+            HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, ex.getClass().getSimpleName(), ex.getMessage(),
+                request.getRequestURI());
     }
 
     @ExceptionHandler(NotFoundException.class)
