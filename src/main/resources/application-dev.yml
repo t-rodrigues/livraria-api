@@ -4,6 +4,12 @@ spring:
     username: ${DATABASE_USER}
     password: ${DATABASE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        '[format_sql]': true
   mail:
     host: ${MAIL_HOST}
     username: ${MAIL_USERNAME}
@@ -18,10 +24,6 @@ spring:
           starttls:
             enable: true
             required: true
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
 
 from:
   email:

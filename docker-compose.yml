@@ -1,17 +1,27 @@
 version: '3.8'
 
 services:
-  db:
-    container_name: db-container
+  livraria_db:
     image: mysql:8
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: docker
-      MYSQL_DATABASE: livraria
+      MYSQL_RANDOM_ROOT_PASSWORD: 'true'
+      MYSQL_USER: ${DATABASE_USER}
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD}
+      MYSQL_DATABASE: ${DATABASE_DEFAULT}
     ports:
       - 3306:3306
     volumes:
       - livraria_data:/var/lib/mysql
+  app:
+    build: .
+    restart: always
+    depends_on:
+      - livraria_db
+    ports:
+      - 8080:8080
+    env_file:
+      - .env
 
 volumes:
   livraria_data:
