@@ -22,10 +22,9 @@ import javax.persistence.EntityNotFoundException;
 @RequiredArgsConstructor
 public class LivroService {
 
-    private ModelMapper modelMapper = new ModelMapper();
-
     private final LivroRepository livroRepository;
     private final AutorRepository autorRepository;
+    private final ModelMapper modelMapper;
 
     @Transactional(readOnly = true)
     public Page<LivroResponseDto> list(Pageable paginacao) {

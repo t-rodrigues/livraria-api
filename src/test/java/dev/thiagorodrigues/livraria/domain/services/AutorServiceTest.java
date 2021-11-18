@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -41,6 +42,9 @@ class AutorServiceTest {
     @Mock
     private AutorRepository autorRepository;
 
+    @Mock
+    private ModelMapper modelMapper;
+
     @InjectMocks
     private AutorService autorService;
 
@@ -48,6 +52,7 @@ class AutorServiceTest {
     private Autor autorAtualizado;
     private AutorFormDto autorFormDto;
     private AutorDetalhadoResponseDto autorDetalhadoResponseDto;
+    private AutorDetalhadoResponseDto autorAtualizadoResponseDto;
     private AutorUpdateFormDto autorUpdateFormDto;
 
     @BeforeEach
@@ -56,12 +61,16 @@ class AutorServiceTest {
         autorAtualizado = AutorFactory.criarAutorAtualizado();
         autorFormDto = AutorFactory.criarAutorFormDto();
         autorDetalhadoResponseDto = AutorFactory.criarAutorDetalhadoResponseDto();
+        autorAtualizadoResponseDto = AutorFactory.criarAutorAtualizadoResponseDto();
         autorUpdateFormDto = AutorFactory.criarAutorUpdateFormDto();
 
+        when(modelMapper.map(autorFormDto, Autor.class)).thenReturn(autor);
+        when(modelMapper.map(autor, AutorDetalhadoResponseDto.class)).thenReturn(autorDetalhadoResponseDto);
+        when(modelMapper.map(autorAtualizado, AutorDetalhadoResponseDto.class)).thenReturn(autorAtualizadoResponseDto);
         when(autorRepository.save(any(Autor.class))).thenReturn(autor);
         when(autorRepository.findById(validId)).thenReturn(Optional.of(autor));
         when(autorRepository.findById(invalidId)).thenReturn(Optional.empty());
-        when(autorRepository.getById(validId)).thenReturn(AutorFactory.criarAutor());
+        when(autorRepository.getById(autorUpdateFormDto.getId())).thenReturn(autorAtualizado);
         doThrow(EntityNotFoundException.class).when(autorRepository).getById(invalidId);
         doThrow(EmptyResultDataAccessException.class).when(autorRepository).deleteById(invalidId);
         doThrow(DataIntegrityViolationException.class).when(autorRepository).deleteById(dependentId);

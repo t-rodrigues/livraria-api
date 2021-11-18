@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 
@@ -44,12 +45,16 @@ class LivroServiceTest {
     @Mock
     private AutorRepository autorRepository;
 
+    @Mock
+    private ModelMapper modelMapper;
+
     @InjectMocks
     private LivroService livroService;
 
     private Livro livro;
     private Livro livroAtualizado;
     private LivroResponseDto livroResponseDto;
+    private LivroResponseDto livroAtualizadoResponseDto;
     private LivroFormDto livroFormDto;
     private LivroUpdateFormDto livroUpdateFormDto;
 
@@ -58,6 +63,7 @@ class LivroServiceTest {
         livro = LivroFactory.criarLivro();
         livroAtualizado = LivroFactory.criarLivroAtualizado();
         livroResponseDto = LivroFactory.criarLivroResponseDto();
+        livroAtualizadoResponseDto = LivroFactory.criarLivroAtualizadoResponseDto();
         livroFormDto = LivroFactory.criarLivroFormDto();
         livroUpdateFormDto = LivroFactory.criarLivroUpdateFormDto();
     }
@@ -73,6 +79,7 @@ class LivroServiceTest {
     @Test
     void detailShouldReturnBookWhenSuccessful() {
         when(livroRepository.findById(validLivroId)).thenReturn(Optional.of(livro));
+        when(modelMapper.map(livro, LivroResponseDto.class)).thenReturn(livroResponseDto);
 
         var livroDto = livroService.detail(validLivroId);
 
@@ -85,8 +92,10 @@ class LivroServiceTest {
 
     @Test
     void createShouldThrowDomainExceptionWhenInvalidAuthorId() {
-        doThrow(DataIntegrityViolationException.class).when(livroRepository).save(any(Livro.class));
         livroFormDto.setAutorId(invalidAutorId);
+
+        when(modelMapper.map(livroFormDto, Livro.class)).thenReturn(livro);
+        doThrow(DataIntegrityViolationException.class).when(livroRepository).save(any(Livro.class));
 
         assertThrows(DomainException.class, () -> livroService.create(livroFormDto));
         verify(autorRepository, times(1)).getById(invalidAutorId);
@@ -94,8 +103,10 @@ class LivroServiceTest {
 
     @Test
     void createShouldReturnBookWhenSuccessful() {
+        when(modelMapper.map(livroFormDto, Livro.class)).thenReturn(livro);
         when(autorRepository.getById(validAutorId)).thenReturn(AutorFactory.criarAutor());
         when(livroRepository.save(any(Livro.class))).thenReturn(livro);
+        when(modelMapper.map(livro, LivroResponseDto.class)).thenReturn(livroResponseDto);
 
         var livroResponse = livroService.create(livroFormDto);
 
@@ -125,6 +136,7 @@ class LivroServiceTest {
     void updateShouldReturnUpdatedBookWhenSuccessful() {
         when(livroRepository.getById(anyLong())).thenReturn(livro);
         when(autorRepository.findById(anyLong())).thenReturn(Optional.of(AutorFactory.criarAutor()));
+        when(modelMapper.map(livro, LivroResponseDto.class)).thenReturn(livroAtualizadoResponseDto);
 
         var livroResponse = livroService.update(livroUpdateFormDto);
 

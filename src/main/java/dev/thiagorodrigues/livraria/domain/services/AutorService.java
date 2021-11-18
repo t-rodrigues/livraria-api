@@ -24,8 +24,7 @@ import javax.persistence.EntityNotFoundException;
 public class AutorService {
 
     private final AutorRepository autorRepository;
-
-    private ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
 
     @Transactional(readOnly = true)
     public Page<AutorResponseDto> list(Pageable paginacao) {
