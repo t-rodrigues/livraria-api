@@ -29,8 +29,9 @@ public class SwaggerConfig {
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder().title("API Livraria").description("Essa é uma API de Livraria.")
                 .license("Apache License Version 2.0").licenseUrl("https://www.apache.org/licenses/LICENSE-2.0")
-                .version("1.0.0")
-                .contact(new Contact("Thiago Rodrigues", "http://github.com/t-rodrigues", "thiagor_@live.com")).build();
+                .version("1.0.0").contact(new Contact("Thiago Rodrigues", "https://github.com/t-rodrigues/livraria-api",
+                        "thiagor_@live.com"))
+                .build();
     }
 
     private ApiKey apiKey() {
