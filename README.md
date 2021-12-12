@@ -13,7 +13,7 @@ Desafio do Bootcamp de Java da Alura. Construção de uma API Rest.
 - [Flyway](https://flywaydb.org/)
 - [JJWT](https://github.com/jwtk/jjwt)
 - [JUnit](https://junit.org/junit5/)
-- [Lombook](https://projectlombok.org/)
+- [Lombok](https://projectlombok.org/)
 - [Maven](https://maven.apache.org/)
 - [ModelMapper](http://modelmapper.org/)
 - [SwaggerUI (3.0.0)](https://github.com/springfox/springfox)
