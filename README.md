@@ -25,7 +25,7 @@ Desafio do Bootcamp de Java da Alura. Construção de uma API Rest.
 Clonar o projeto
 
 ```bash
-  git clone https://github.com/t-rodrigues/livraria-api
+  git clone https://github.com/t-rodrigues/livraria-api.git
 ```
 
 Acessar o diretorio do projeto
